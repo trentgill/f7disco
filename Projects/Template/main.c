@@ -37,6 +37,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "lib/disco_hw.h"
 
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
@@ -65,37 +66,38 @@ static void CPU_CACHE_Enable(void);
   */
 int main(void)
 {
-  /* This project template calls firstly two functions in order to configure MPU feature 
-     and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().
-     These functions are provided as template implementation that User may integrate 
-     in his application, to enhance the performance in case of use of AXI interface 
-     with several masters. */ 
+	/* This project template calls firstly two functions in order to configure MPU feature 
+		and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().
+		These functions are provided as template implementation that User may integrate 
+		in his application, to enhance the performance in case of use of AXI interface 
+		with several masters. */ 
   
-  /* Configure the MPU attributes as Write Through */
-  MPU_Config();
+	/* Configure the MPU attributes as Write Through */
+	MPU_Config();
 
-  /* Enable the CPU Cache */
-  CPU_CACHE_Enable();
+	/* Enable the CPU Cache */
+	CPU_CACHE_Enable();
 
-  /* STM32F7xx HAL library initialization:
-       - Configure the Flash ART accelerator on ITCM interface
-       - Configure the Systick to generate an interrupt each 1 msec
-       - Set NVIC Group Priority to 4
-       - Low Level Initialization
-     */
-  HAL_Init();
+	/* STM32F7xx HAL library initialization:
+		- Configure the Flash ART accelerator on ITCM interface
+		- Configure the Systick to generate an interrupt each 1 msec
+		- Set NVIC Group Priority to 4
+		- Low Level Initialization
+	*/
+	HAL_Init();
 
-  /* Configure the system clock to 216 MHz */
-  SystemClock_Config();
-
-
-  /* Add your application code here */
+	/* Configure the system clock to 216 MHz */
+	SystemClock_Config();
 
 
-  /* Infinite loop */
-  while (1)
-  {
-  }
+	/* Add your application code here */
+	Disco_HW_Init();
+
+	/* Infinite loop */
+	while (1)
+	{
+		Disco_HW_Demo();
+	}
 }
 
 /**

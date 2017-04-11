@@ -37,8 +37,11 @@ SRC = main.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c \
-	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c
-	# lib/*.c
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
+	lib/*.c
 
 OBJDIR = .
 OBJ = $(SRC:%.c=$(OBJDIR)/%.o) 
