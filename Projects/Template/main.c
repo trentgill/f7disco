@@ -36,7 +36,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include <string.h>
+#include <stdio.h>
+
 #include "main.h"
+#include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
 
 /** @addtogroup STM32F7xx_HAL_Examples
@@ -86,17 +90,23 @@ int main(void)
 	*/
 	HAL_Init();
 
-	/* Configure the system clock to 216 MHz */
+	/* Configure the system clock to !216-> 200(for screen) MHz */
 	SystemClock_Config();
 
+	Debug_USART_Init();
 
 	/* Add your application code here */
 	Disco_HW_Init();
 
+	Debug_USART_printf("go\n\r");
+	// Debug_USART_putn(45);
+
 	/* Infinite loop */
 	while (1)
 	{
-		Disco_HW_Demo();
+		Disco_HW_Loop();
+
+		// Debug_USART_printf("go\n");
 	}
 }
 
@@ -104,7 +114,7 @@ int main(void)
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
   *            System Clock source            = PLL (HSE)
-  *            SYSCLK(Hz)                     = 216000000
+  *            SYSCLK(Hz)                     = 216000000 -> only 200 RN!
   *            HCLK(Hz)                       = 216000000
   *            AHB Prescaler                  = 1
   *            APB1 Prescaler                 = 4
@@ -141,7 +151,7 @@ static void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 25;
-  RCC_OscInitStruct.PLL.PLLN = 432;  
+  RCC_OscInitStruct.PLL.PLLN = 400;  // for 216MHz use 432 !!!!!!!!!!
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 9;
   RCC_OscInitStruct.PLL.PLLR = 7;  

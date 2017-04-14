@@ -13,7 +13,7 @@ OD=arm-none-eabi-objdump
 # BIN=$(CP) -O ihex 
 BIN = $(TARGET).bin
 
-DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F7XX -DARM_MATH_CM7 -DHSE_VALUE=8000000
+DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F7XX -DARM_MATH_CM7 -DHSE_VALUE=25000000
 STARTUP = ../../../STM32Cube_FW_F7_V1.6.0/Drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f769xx.s
 
 MCU = cortex-m4
@@ -36,11 +36,22 @@ SRC = main.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc_ex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma2d.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dsi.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sdram.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_usart.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/Components/otm8009a/otm8009a.c \
 	lib/*.c
 
 OBJDIR = .
@@ -53,7 +64,7 @@ $(TARGET).hex: $(EXECUTABLE)
 	$(CP) -O ihex $^ $@
 
 $(EXECUTABLE): $(SRC) $(STARTUP)
-	$(CC) $(CFLAGS) $^ -lm -lc -lnosys -o $@
+	$(CC) -g $(CFLAGS) $^ -lm -lc -lnosys -o $@
 
 clean:
 	rm -f Startup.lst $(TARGET).lst $(OBJ) $(AUTOGEN)  $(TARGET).out  $(TARGET).hex  $(TARGET).map \

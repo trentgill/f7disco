@@ -1,0 +1,588 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"USAR",
+				"Debug_USART_putc"
+			],
+			[
+				"USA",
+				"Debug_USART_putc"
+			],
+			[
+				"USART_Prit",
+				"Debug_USART_printf"
+			],
+			[
+				"On",
+				"OnError_Handler"
+			],
+			[
+				"BSP_",
+				"BSP_LED_On"
+			],
+			[
+				"STM",
+				"STM32F7xx_HAL_Driver"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "/**\n  ******************************************************************************\n  * @file    Templates/Src/main.c \n  * @author  MCD Application Team\n  * @version V1.0.0\n  * @date    22-April-2016\n  * @brief   Main program body\n  ******************************************************************************\n  * @attention\n  *\n  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>\n  *\n  * Redistribution and use in source and binary forms, with or without modification,\n  * are permitted provided that the following conditions are met:\n  *   1. Redistributions of source code must retain the above copyright notice,\n  *      this list of conditions and the following disclaimer.\n  *   2. Redistributions in binary form must reproduce the above copyright notice,\n  *      this list of conditions and the following disclaimer in the documentation\n  *      and/or other materials provided with the distribution.\n  *   3. Neither the name of STMicroelectronics nor the names of its contributors\n  *      may be used to endorse or promote products derived from this software\n  *      without specific prior written permission.\n  *\n  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n  *\n  ******************************************************************************\n  */\n\n/* Includes ------------------------------------------------------------------*/\n#include <string.h>\n#include <stdio.h>\n\n#include \"main.h\"\n#include \"lib/usart_debug.h\"\n#include \"lib/disco_hw.h\"\n\n/** @addtogroup STM32F7xx_HAL_Examples\n  * @{\n  */\n\n/** @addtogroup Templates\n  * @{\n  */\n\n/* Private typedef -----------------------------------------------------------*/\n/* Private define ------------------------------------------------------------*/\n/* Private macro -------------------------------------------------------------*/\n/* Private variables ---------------------------------------------------------*/\n/* Private function prototypes -----------------------------------------------*/\nstatic void SystemClock_Config(void);\nstatic void Error_Handler(void);\nstatic void MPU_Config(void);\nstatic void CPU_CACHE_Enable(void);\n\n/* Private functions ---------------------------------------------------------*/\n\n/**\n  * @brief  Main program\n  * @param  None\n  * @retval None\n  */\nint main(void)\n{\n	/* This project template calls firstly two functions in order to configure MPU feature \n		and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().\n		These functions are provided as template implementation that User may integrate \n		in his application, to enhance the performance in case of use of AXI interface \n		with several masters. */ \n  \n	/* Configure the MPU attributes as Write Through */\n	MPU_Config();\n\n	/* Enable the CPU Cache */\n	CPU_CACHE_Enable();\n\n	/* STM32F7xx HAL library initialization:\n		- Configure the Flash ART accelerator on ITCM interface\n		- Configure the Systick to generate an interrupt each 1 msec\n		- Set NVIC Group Priority to 4\n		- Low Level Initialization\n	*/\n	HAL_Init();\n\n	/* Configure the system clock to 216 MHz */\n	SystemClock_Config();\n\n  Debug_USART_Init();\n  Debug_USART_Print(\"go\\n\");\n\n	/* Add your application code here */\n	Disco_HW_Init();\n\n	/* Infinite loop */\n	while (1)\n	{\n		Disco_HW_Loop();\n	}\n}\n\n/**\n  * @brief  System Clock Configuration\n  *         The system Clock is configured as follow : \n  *            System Clock source            = PLL (HSE)\n  *            SYSCLK(Hz)                     = 216000000\n  *            HCLK(Hz)                       = 216000000\n  *            AHB Prescaler                  = 1\n  *            APB1 Prescaler                 = 4\n  *            APB2 Prescaler                 = 2\n  *            HSE Frequency(Hz)              = 25000000\n  *            PLL_M                          = 25\n  *            PLL_N                          = 432\n  *            PLL_P                          = 2\n  *            PLL_Q                          = 9\n  *            PLL_R                          = 7\n  *            VDD(V)                         = 3.3\n  *            Main regulator output voltage  = Scale1 mode\n  *            Flash Latency(WS)              = 7\n  * @param  None\n  * @retval None\n  */\nstatic void SystemClock_Config(void)\n{\n  RCC_ClkInitTypeDef RCC_ClkInitStruct;\n  RCC_OscInitTypeDef RCC_OscInitStruct;\n  HAL_StatusTypeDef ret = HAL_OK;\n  \n  /* Enable Power Control clock */\n  __HAL_RCC_PWR_CLK_ENABLE();\n  \n  /* The voltage scaling allows optimizing the power consumption when the device is \n     clocked below the maximum system frequency, to update the voltage scaling value \n     regarding system frequency refer to product datasheet.  */\n  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);  \n\n  /* Enable HSE Oscillator and activate PLL with HSE as source */\n  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;\n  RCC_OscInitStruct.HSEState = RCC_HSE_ON;\n  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;\n  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;\n  RCC_OscInitStruct.PLL.PLLM = 25;\n  RCC_OscInitStruct.PLL.PLLN = 400;  // for 216MHz use 432 !!!!!!!!!!\n  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;\n  RCC_OscInitStruct.PLL.PLLQ = 9;\n  RCC_OscInitStruct.PLL.PLLR = 7;  \n  \n  ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);\n  if(ret != HAL_OK)\n  {\n    Error_Handler();\n  }\n  \n  /* Activate the OverDrive to reach the 216 MHz Frequency */  \n  ret = HAL_PWREx_EnableOverDrive();\n  if(ret != HAL_OK)\n  {\n    Error_Handler();\n  }\n  \n  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */\n  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);\n  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;\n  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;\n  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;  \n  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2; \n  \n  ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7);\n  if(ret != HAL_OK)\n  {\n    Error_Handler();\n  }\n}\n\n/**\n  * @brief  This function is executed in case of error occurrence.\n  * @param  None\n  * @retval None\n  */\nstatic void Error_Handler(void)\n{\n  /* User may add here some code to deal with this error */\n  while(1)\n  {\n  }\n}\n\n/**\n  * @brief  Configure the MPU attributes as Write Through for Internal SRAM1/2.\n  * @note   The Base Address is 0x20020000 since this memory interface is the AXI.\n  *         The Configured Region Size is 512KB because the internal SRAM1/2 \n  *         memory size is 384KB.\n  * @param  None\n  * @retval None\n  */\nstatic void MPU_Config(void)\n{\n  MPU_Region_InitTypeDef MPU_InitStruct;\n  \n  /* Disable the MPU */\n  HAL_MPU_Disable();\n\n  /* Configure the MPU attributes as WT for SRAM */\n  MPU_InitStruct.Enable = MPU_REGION_ENABLE;\n  MPU_InitStruct.BaseAddress = 0x20020000;\n  MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;\n  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;\n  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;\n  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;\n  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;\n  MPU_InitStruct.Number = MPU_REGION_NUMBER0;\n  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;\n  MPU_InitStruct.SubRegionDisable = 0x00;\n  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;\n\n  HAL_MPU_ConfigRegion(&MPU_InitStruct);\n\n  /* Enable the MPU */\n  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);\n}\n\n/**\n  * @brief  CPU L1-Cache enable.\n  * @param  None\n  * @retval None\n  */\nstatic void CPU_CACHE_Enable(void)\n{\n  /* Enable I-Cache */\n  SCB_EnableICache();\n\n  /* Enable D-Cache */\n  SCB_EnableDCache();\n}\n\n#ifdef  USE_FULL_ASSERT\n\n/**\n  * @brief  Reports the name of the source file and the source line number\n  *         where the assert_param error has occurred.\n  * @param  file: pointer to the source file name\n  * @param  line: assert_param error line source number\n  * @retval None\n  */\nvoid assert_failed(uint8_t* file, uint32_t line)\n{ \n  /* User can add his own implementation to report the file name and line number,\n     ex: printf(\"Wrong parameters value: file %s on line %d\\r\\n\", file, line) */\n\n  /* Infinite loop */\n  while (1)\n  {\n  }\n}\n#endif\n\n/**\n  * @}\n  */\n\n/**\n  * @}\n  */\n\n/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/\n",
+			"file": "Projects/Template/main.c",
+			"file_size": 9251,
+			"file_write_time": 1492025879000000,
+			"settings":
+			{
+				"buffer_size": 9032,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Projects/Template/lib/disco_screen.c",
+			"settings":
+			{
+				"buffer_size": 12652,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Projects/Template/lib/disco_screen.h",
+			"settings":
+			{
+				"buffer_size": 423,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Projects/Template/lib/disco_hw.c",
+			"settings":
+			{
+				"buffer_size": 450,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Projects/Template/Makefile",
+			"settings":
+			{
+				"buffer_size": 3482,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Projects/Template/stm32f7xx_hal_conf.h",
+			"settings":
+			{
+				"buffer_size": 17181,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Projects/Template/system_stm32f7xx.c",
+			"settings":
+			{
+				"buffer_size": 14735,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Projects/Template/lib/debug_usart.c",
+			"settings":
+			{
+				"buffer_size": 2882,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Projects/Template/lib/debug_usart.h",
+			"settings":
+			{
+				"buffer_size": 317,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/trent/dev/JF3/lib/debug.h",
+			"settings":
+			{
+				"buffer_size": 796,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/trent/dev/JF3/lib/debug.c",
+			"settings":
+			{
+				"buffer_size": 5747,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/trent/dev/f7disco/Projects/Template/stm32f7xx_it.h",
+		"/home/trent/dev/f7disco/Projects/Template/stm32f7xx_it.c",
+		"/home/trent/dev/f7disco/Projects/Template/lib/disco_hw.c",
+		"/home/trent/dev/f7disco/Projects/Template/lib/disco_hw.h",
+		"/home/trent/dev/f7disco/Projects/Template/stm32f7xx_hal_conf.h",
+		"/home/trent/dev/f7disco/Projects/Template/Makefile",
+		"/home/trent/dev/f7disco/Projects/Template/main.h",
+		"/home/trent/dev/f7disco/Projects/Template/stm32_flash.ld",
+		"/home/trent/dev/STM32Cube_FW_F7_V1.6.0/Projects/STM32F769I-Discovery/Templates/SW4STM32/STM32F769I_DISCOVERY_AXIM-FLASH/STM32F769NIHx_FLASH.ld",
+		"/home/trent/dev/f7disco/Projects/Src/Makefile",
+		"/home/trent/dev/f7disco/Projects/Src/stm32_flash.ld",
+		"/home/trent/dev/STM32Cube_FW_F7_V1.6.0/Projects/STM32F769I-Discovery/Templates/SW4STM32/STM32F769I_DISCOVERY_ITCM-FLASH/STM32F769NIHx_ITCM_FLASH.ld",
+		"/home/trent/dev/JF3/stm32_flash.ld",
+		"/home/trent/dev/jack2/example-clients/showtime.c",
+		"/home/trent/dev/jack2/example-clients/wscript"
+	],
+	"find":
+	{
+		"height": 42.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"Vector",
+			"discovery",
+			".gitignore",
+			"stm32f769",
+			".fpu",
+			"float",
+			"HAL_PWREx_EnableOverDrive",
+			"HAL_RCC_OscConfig",
+			"HAL_Init",
+			"t HAL_Init",
+			"void HAL_Init",
+			"HAL_MPU_Disable",
+			"HAL_Init",
+			"CODEC_RESET_MASK"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 7,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Projects/Template/main.c",
+					"settings":
+					{
+						"buffer_size": 9032,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3830,
+								3830
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2262.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Projects/Template/lib/disco_screen.c",
+					"settings":
+					{
+						"buffer_size": 12652,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								26,
+								26
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Projects/Template/lib/disco_screen.h",
+					"settings":
+					{
+						"buffer_size": 423,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								299,
+								299
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Projects/Template/lib/disco_hw.c",
+					"settings":
+					{
+						"buffer_size": 450,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								78,
+								78
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Projects/Template/Makefile",
+					"settings":
+					{
+						"buffer_size": 3482,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2852,
+								2852
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1170.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Projects/Template/stm32f7xx_hal_conf.h",
+					"settings":
+					{
+						"buffer_size": 17181,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15968,
+								15968
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10608.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Projects/Template/system_stm32f7xx.c",
+					"settings":
+					{
+						"buffer_size": 14735,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14735,
+								14735
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10217.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "Projects/Template/lib/debug_usart.c",
+					"settings":
+					{
+						"buffer_size": 2882,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2278,
+								2278
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "Projects/Template/lib/debug_usart.h",
+					"settings":
+					{
+						"buffer_size": 317,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								310,
+								310
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 9,
+					"file": "/home/trent/dev/JF3/lib/debug.h",
+					"settings":
+					{
+						"buffer_size": 796,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								285,
+								285
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/home/trent/dev/JF3/lib/debug.c",
+					"settings":
+					{
+						"buffer_size": 5747,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2235,
+								2235
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 546.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}
