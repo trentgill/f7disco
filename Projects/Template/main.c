@@ -94,25 +94,22 @@ int main(void)
 	/* Configure the system clock to !216-> 200(for screen) MHz */
 	SystemClock_Config();
 
+	// HW initialization
 	Debug_USART_Init();
-
-	/* Add your application code here */
 	Disco_HW_Init();
 
+	// Debug Boot messages
 	Debug_USART_printf("time to party!\n\r");
-	Disco_Term_Printf("time to party!");
-	Disco_Term_Printf(" time to party!");
-	// Debug_USART_putn(45);
+	Disco_Term_Read_Debug("time to party!");
 
-	/* Infinite loop */
+	// Infinite loop
 	uint8_t counter = 0;
 	char count[2] = { '0', '\0'}; // Manual String generation
-	// char count[3];
 
 	while (1)
 	{
 		Disco_HW_Loop();
-    HAL_Delay(600);
+		HAL_Delay(600);
 
 		counter++;
 		if(counter > 8) {
@@ -121,14 +118,10 @@ int main(void)
 		count[0] = counter+48;
 		Disco_Term_Read_String(count);
 		
-    HAL_Delay(600);
-    // Echo Terminal EVAL over usart
+		HAL_Delay(600);
+		// Echo Terminal EVAL over usart
 		Debug_USART_printf( Disco_Term_Eval() );
-    Debug_USART_printf( "\n\r" );
-    
-		// Disco_Term_CL(count);
-
-		// Debug_USART_printf("go\n");
+		Debug_USART_printf( "\n\r" );
 	}
 }
 

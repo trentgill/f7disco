@@ -15,56 +15,17 @@ term_t 	dterm;
 
 void Disco_Term_Splash(void)
 {
-	BSP_LCD_SetFont(&Font24);
-	BSP_LCD_SetBackColor(LCD_COLOR_GRAY); // white on grey debug messages
 	BSP_LCD_SetTextColor(LCD_COLOR_GRAY);
 	BSP_LCD_FillRect(0,  0, 800,  72);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	Disco_Term_Read_Debug("/\\/\\/\\/ Disco Term /\\/\\/\\/");
 
-	BSP_LCD_SetTextColor(LCD_COLOR_BLUE); // Fill Rect uses "TextColor" not Backcolor
-	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
 	BSP_LCD_FillRect(0, 72, 800, 408);
 
 	HAL_DSI_Refresh(&hdsi_discovery);
 
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // white on blue term
-}
-
-void Disco_Term_Printf(unsigned char* s)
-{
-	// Disco_Term_PrintLine(s);
-	// Disco_Term_PrintLine(s);
-	// Disco_Term_PrintLine(s);
-	// Disco_Term_PrintLine(s);
-
-	// BSP_LCD_DisplayStringAtLine(3, s);
-	// BSP_LCD_DisplayStringAtLine(5, s);
-	// BSP_LCD_DisplayStringAtLine(7, s);
-	// BSP_LCD_DisplayStringAtLine(9, s);
-	// BSP_LCD_DisplayStringAtLine(11, s);
-	// BSP_LCD_DisplayStringAtLine(13, s);
-	// BSP_LCD_DisplayStringAtLine(15, s);
-	// BSP_LCD_DisplayStringAtLine(17, s);
-	// BSP_LCD_DisplayStringAtLine(19, s);
-	// HAL_DSI_Refresh(&hdsi_discovery);
-}
-
-void Disco_Term_CL(unsigned char* s)
-{
-	// BSP_LCD_ClearStringLine(19);
-	// BSP_LCD_DisplayStringAtLine(19, s);
-	// HAL_DSI_Refresh(&hdsi_discovery);
-}
-
-void Disco_Term_PrintLine(unsigned char* s)
-{
-// 	BSP_LCD_ClearStringLine(curLine*2 + 1);
-// 	BSP_LCD_DisplayStringAtLine(curLine*2 + 1, (uint8_t *)s);
-
-// 	if(curLine++ >= 10) { curLine -= 10; }
-
-// 	HAL_DSI_Refresh(&hdsi_discovery);
+	BSP_LCD_SetFont(&Font24);
+	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // white on blue
 }
 
 // REPL
