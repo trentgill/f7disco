@@ -42,6 +42,7 @@
 #include "main.h"
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
+#include "lib/disco_term.h"
 
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
@@ -98,13 +99,34 @@ int main(void)
 	/* Add your application code here */
 	Disco_HW_Init();
 
-	Debug_USART_printf("go\n\r");
+	Debug_USART_printf("time to party!\n\r");
+	Disco_Term_Printf("time to party!");
+	Disco_Term_Printf(" time to party!");
 	// Debug_USART_putn(45);
 
 	/* Infinite loop */
+	uint8_t counter = 0;
+	char count[2] = { '0', '\0'}; // Manual String generation
+	// char count[3];
+
 	while (1)
 	{
 		Disco_HW_Loop();
+    HAL_Delay(600);
+
+		counter++;
+		if(counter > 8) {
+			counter = 0;
+		}
+		count[0] = counter+48;
+		Disco_Term_Read_String(count);
+		
+    HAL_Delay(600);
+    // Echo Terminal EVAL over usart
+		Debug_USART_printf( Disco_Term_Eval() );
+    Debug_USART_printf( "\n\r" );
+    
+		// Disco_Term_CL(count);
 
 		// Debug_USART_printf("go\n");
 	}

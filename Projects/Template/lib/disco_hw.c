@@ -1,7 +1,7 @@
 #include "disco_hw.h"
 #include "debug_usart.h"
-// #include "disco_screen.h"
-
+#include "disco_screen.h"
+#include "disco_term.h"
 //
 void Disco_HW_Init(void)
 {
@@ -15,7 +15,8 @@ void Disco_HW_Init(void)
 	BSP_PB_Init(0, BUTTON_MODE_GPIO);
 
 	// Screen
-	// Disco_Screen_Init();
+	Disco_Screen_Init();
+	Disco_Term_Splash();
 
 }
 
@@ -33,7 +34,7 @@ void Disco_HW_Loop(void)
 		BSP_LED_Off(LED1);
 	}
 	
-	BSP_LED_Toggle(LED2);
+	// BSP_LED_Toggle(LED2);
 
 	lastButton = press;
 	// Disco_Screen_Loop();
