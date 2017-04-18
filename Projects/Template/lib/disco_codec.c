@@ -80,6 +80,9 @@ void Disco_Codec_Init(void)
 		Debug_USART_printf("couldn't reset i2c device");
 	}
 
+	// Set DSP_Block Sample Rate
+	DSP_Sample_Rate( SaiHandle.Init.AudioFrequency );
+
 	// Zero the output buffer
 	for( uint16_t i=0; i<PLAY_BUFF_SIZE; i++ ){
 		PlayBuff[i] = 0;
