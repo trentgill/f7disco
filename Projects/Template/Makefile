@@ -34,6 +34,7 @@ SRC = main.c \
 	system_stm32f7xx.c \
 	stm32f7xx_hal_msp.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dfsdm.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c \
@@ -46,12 +47,15 @@ SRC = main.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma2d.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dsi.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sdram.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sai.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_usart.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_audio.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c \
 	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/Components/otm8009a/otm8009a.c \
+	../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/Components/wm8994/wm8994.c \
 	lib/*.c
 
 OBJDIR = .

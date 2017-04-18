@@ -43,6 +43,7 @@
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
 #include "lib/disco_term.h"
+#include "lib/disco_codec.h"
 
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
@@ -96,7 +97,8 @@ int main(void)
 
 	// HW initialization
 	Debug_USART_Init();
-	Disco_HW_Init();
+	Disco_HW_Init();	
+	Disco_Codec_Init();
 
 	// Debug Boot messages
 	Debug_USART_printf("time to party!\n\r");
@@ -108,9 +110,12 @@ int main(void)
 
 	while (1)
 	{
-		Disco_HW_Loop();
-		HAL_Delay(600);
+		Disco_Codec_Loop();
+		
 
+	// below is terminal test case
+		/* Disco_HW_Loop();
+		HAL_Delay(600);
 		counter++;
 		if(counter > 8) {
 			counter = 0;
@@ -121,7 +126,7 @@ int main(void)
 		HAL_Delay(600);
 		// Echo Terminal EVAL over usart
 		Debug_USART_printf( Disco_Term_Eval() );
-		Debug_USART_printf( "\n\r" );
+		Debug_USART_printf( "\n\r" );*/
 	}
 }
 
