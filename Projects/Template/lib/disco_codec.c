@@ -5,16 +5,17 @@
 
 // Private defines
 #define DSP_BLOCK_SIZE		1024
+	// this is matched to hardcoded val in i2c audio driver(?)
 #define PLAY_HALF_BUFF		(DSP_BLOCK_SIZE*2) // stereo
 #define PLAY_BUFF_SIZE		(PLAY_HALF_BUFF*2) // double-buff
 
 // Private variables
-SAI_HandleTypeDef            SaiHandle;
-DMA_HandleTypeDef            hSaiDma;
-AUDIO_DrvTypeDef            *audio_drv;
+SAI_HandleTypeDef		SaiHandle;
+DMA_HandleTypeDef		hSaiDma;
+AUDIO_DrvTypeDef		*audio_drv;
 
-uint16_t                     PlayBuff[PLAY_BUFF_SIZE];
-__IO int16_t                 UpdatePointer = -1;
+uint16_t				PlayBuff[PLAY_BUFF_SIZE];
+__IO int16_t			UpdatePointer = -1;
 
 // Public Functions
 void Disco_Codec_Init(void)
@@ -112,72 +113,69 @@ void Disco_Codec_Loop(void)
 // HW Enable
 void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai)
 {
-  GPIO_InitTypeDef  GPIO_Init;
-  
-  /* Enable SAI1 clock */
-  __HAL_RCC_SAI1_CLK_ENABLE();
-  
-  /* Configure GPIOs used for SAI2 */
-  AUDIO_SAIx_MCLK_ENABLE();
-  AUDIO_SAIx_SCK_ENABLE();
-  AUDIO_SAIx_FS_ENABLE();
-  AUDIO_SAIx_SD_ENABLE();
-  
-  GPIO_Init.Mode      = GPIO_MODE_AF_PP;
-  GPIO_Init.Pull      = GPIO_NOPULL;
-  GPIO_Init.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-  
-  GPIO_Init.Alternate = AUDIO_SAIx_FS_AF;
-  GPIO_Init.Pin       = AUDIO_SAIx_FS_PIN;
-  HAL_GPIO_Init(AUDIO_SAIx_FS_GPIO_PORT, &GPIO_Init);
-  GPIO_Init.Alternate = AUDIO_SAIx_SCK_AF;
-  GPIO_Init.Pin       = AUDIO_SAIx_SCK_PIN;
-  HAL_GPIO_Init(AUDIO_SAIx_SCK_GPIO_PORT, &GPIO_Init);
-  GPIO_Init.Alternate = AUDIO_SAIx_SD_AF;
-  GPIO_Init.Pin       = AUDIO_SAIx_SD_PIN;
-  HAL_GPIO_Init(AUDIO_SAIx_SD_GPIO_PORT, &GPIO_Init);
-  GPIO_Init.Alternate = AUDIO_SAIx_MCLK_AF;
-  GPIO_Init.Pin       = AUDIO_SAIx_MCLK_PIN;
-  HAL_GPIO_Init(AUDIO_SAIx_MCLK_GPIO_PORT, &GPIO_Init);
-  
-  /* Configure DMA used for SAI2 */
-  __HAL_RCC_DMA2_CLK_ENABLE();
+	GPIO_InitTypeDef	GPIO_Init;
 
-  if(hsai->Instance == AUDIO_SAIx)
-  {
-    hSaiDma.Init.Channel             = DMA_CHANNEL_10;
-    hSaiDma.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hSaiDma.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hSaiDma.Init.MemInc              = DMA_MINC_ENABLE;
-    hSaiDma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hSaiDma.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-    hSaiDma.Init.Mode                = DMA_CIRCULAR;
-    hSaiDma.Init.Priority            = DMA_PRIORITY_HIGH;
-    hSaiDma.Init.FIFOMode            = DMA_FIFOMODE_ENABLE;      
-    hSaiDma.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hSaiDma.Init.MemBurst            = DMA_MBURST_SINGLE;         
-    hSaiDma.Init.PeriphBurst         = DMA_PBURST_SINGLE;         
+	// Enable SAI1 clock
+	__HAL_RCC_SAI1_CLK_ENABLE();
 
-    /* Select the DMA instance to be used for the transfer : DMA2_Stream6 */
-    hSaiDma.Instance                 = DMA2_Stream6;
-  
-    /* Associate the DMA handle */
-    __HAL_LINKDMA(hsai, hdmatx, hSaiDma);
+	// Configure GPIOs used for SAI2
+	AUDIO_SAIx_MCLK_ENABLE();
+	AUDIO_SAIx_SCK_ENABLE();
+	AUDIO_SAIx_FS_ENABLE();
+	AUDIO_SAIx_SD_ENABLE();
 
-    /* Deinitialize the Stream for new transfer */
-    HAL_DMA_DeInit(&hSaiDma);
+	GPIO_Init.Mode	= GPIO_MODE_AF_PP;
+	GPIO_Init.Pull	= GPIO_NOPULL;
+	GPIO_Init.Speed	= GPIO_SPEED_FREQ_VERY_HIGH;
 
-    /* Configure the DMA Stream */
-    if (HAL_OK != HAL_DMA_Init(&hSaiDma))
-    {
-      Debug_USART_printf("dma failed to init");
-    }
-  }
-	
-  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 0x01, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
+	GPIO_Init.Alternate	= AUDIO_SAIx_FS_AF;
+	GPIO_Init.Pin			= AUDIO_SAIx_FS_PIN;
+	HAL_GPIO_Init(AUDIO_SAIx_FS_GPIO_PORT, &GPIO_Init);
+	GPIO_Init.Alternate	= AUDIO_SAIx_SCK_AF;
+	GPIO_Init.Pin			= AUDIO_SAIx_SCK_PIN;
+	HAL_GPIO_Init(AUDIO_SAIx_SCK_GPIO_PORT, &GPIO_Init);
+	GPIO_Init.Alternate	= AUDIO_SAIx_SD_AF;
+	GPIO_Init.Pin			= AUDIO_SAIx_SD_PIN;
+	HAL_GPIO_Init(AUDIO_SAIx_SD_GPIO_PORT, &GPIO_Init);
+	GPIO_Init.Alternate	= AUDIO_SAIx_MCLK_AF;
+	GPIO_Init.Pin			= AUDIO_SAIx_MCLK_PIN;
+	HAL_GPIO_Init(AUDIO_SAIx_MCLK_GPIO_PORT, &GPIO_Init);
+
+	// Configure DMA used for SAI2
+	__HAL_RCC_DMA2_CLK_ENABLE();
+
+	if( hsai->Instance == AUDIO_SAIx ){
+		hSaiDma.Init.Channel				= DMA_CHANNEL_10;
+		hSaiDma.Init.Direction				= DMA_MEMORY_TO_PERIPH;
+		hSaiDma.Init.PeriphInc				= DMA_PINC_DISABLE;
+		hSaiDma.Init.MemInc					= DMA_MINC_ENABLE;
+		hSaiDma.Init.PeriphDataAlignment	= DMA_PDATAALIGN_HALFWORD;
+		hSaiDma.Init.MemDataAlignment		= DMA_MDATAALIGN_HALFWORD;
+		hSaiDma.Init.Mode					= DMA_CIRCULAR;
+		hSaiDma.Init.Priority				= DMA_PRIORITY_HIGH;
+		hSaiDma.Init.FIFOMode				= DMA_FIFOMODE_ENABLE;
+		hSaiDma.Init.FIFOThreshold			= DMA_FIFO_THRESHOLD_FULL;
+		hSaiDma.Init.MemBurst				= DMA_MBURST_SINGLE;
+		hSaiDma.Init.PeriphBurst			= DMA_PBURST_SINGLE;
+
+		// Select the DMA instance to be used for the transfer : DMA2_Stream6
+		hSaiDma.Instance                 = DMA2_Stream6;
+
+		// Associate the DMA handle
+		__HAL_LINKDMA(hsai, hdmatx, hSaiDma);
+
+		// Deinitialize the Stream for new transfer
+		HAL_DMA_DeInit(&hSaiDma);
+
+		// Configure the DMA Stream
+		if( HAL_OK != HAL_DMA_Init(&hSaiDma) ){
+			Debug_USART_printf("dma failed to init");
+		}
+	}
+
+	HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 0x01, 0);
+	HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 }
-
 
 // Sets a callback flag to process a block of audio in main loop
 // Alternatively, could call DSP_Block_Process() inside the interrupt?
@@ -193,9 +191,7 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 	UpdatePointer = 0;
 }
 
-
 void DMA2_Stream6_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(SaiHandle.hdmatx);
 }
-
