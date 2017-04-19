@@ -21,6 +21,8 @@ File structure is arranged as follows:
 # Roadmap
 
 - usart to accept strings from minicom
+	- once doing string entry, need to move screen refresh to timer
+		> otherwise it will be called from uart interrupt!
 - wrLib integration: osc / gate arrangement
 - lua vm running on board
 - lua interpreter running

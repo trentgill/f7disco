@@ -109,8 +109,9 @@ unsigned char* Disco_Term_Eval(void)
 	}
 	Disco_Term_Read_Clear(); // clear prompt & redraw screen
 
+	row = dterm.ix_read;
 	dterm.ix_read++;
 	if( dterm.ix_read > (TERM_MAX_LINES-1) ) { dterm.ix_read = 0; }
 
-	return dterm.line[dterm.ix_read];
+	return dterm.line[row];
 }

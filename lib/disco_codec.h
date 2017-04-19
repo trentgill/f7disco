@@ -35,6 +35,6 @@
 void Disco_Codec_Init(void);
 void Disco_Codec_Loop(void); // temporary: call from main loop
 
-void DMA2_Stream6_IRQHandler(void);
+// void DMA2_Stream6_IRQHandler(void);
 
 #endif

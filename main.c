@@ -110,11 +110,10 @@ int main(void)
 
 	while (1)
 	{
-		Disco_Codec_Loop();
-		
+		// Disco_Codec_Loop();
 
 	// below is terminal test case
-		/* Disco_HW_Loop();
+		Disco_HW_Loop();
 		HAL_Delay(600);
 		counter++;
 		if(counter > 8) {
@@ -125,8 +124,10 @@ int main(void)
 		
 		HAL_Delay(600);
 		// Echo Terminal EVAL over usart
-		Debug_USART_printf( Disco_Term_Eval() );
-		Debug_USART_printf( "\n\r" );*/
+    char eval_to_str[51];
+		strcpy( eval_to_str, Disco_Term_Eval() );
+    strcat( eval_to_str, "\n\r" );
+    Debug_USART_printf( eval_to_str );
 	}
 }
 

@@ -98,6 +98,8 @@ void Disco_Codec_Init(void)
 	}
 }
 
+// Call DSP Block from main loop
+// Could move below into an interrupt to max-prioritize audio
 void Disco_Codec_Loop(void)
 {
 	if( UpdatePointer != -1 ){ // dma waiting flag set
