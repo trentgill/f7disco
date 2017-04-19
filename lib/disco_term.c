@@ -1,6 +1,6 @@
+#include <stm32f769i_discovery_lcd.h>
 #include "disco_term.h"
 #include "debug_usart.h"
-#include "../../../../STM32Cube_FW_F7_V1.6.0/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.h"
 
 extern DSI_HandleTypeDef hdsi_discovery;
 
