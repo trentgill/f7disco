@@ -81,7 +81,7 @@ void Disco_Codec_Init(void)
 	}
 
 	// Set DSP_Block Sample Rate
-	DSP_Sample_Rate( SaiHandle.Init.AudioFrequency );
+	DSP_Sample_Rate( SaiHandle.Init.AudioFrequency, DSP_BLOCK_SIZE );
 
 	// Zero the output buffer
 	for( uint16_t i=0; i<PLAY_BUFF_SIZE; i++ ){

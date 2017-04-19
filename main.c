@@ -53,6 +53,8 @@
   * @{
   */
 
+extern uint32_t uwTick;  // time since reboot (ms)
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -62,6 +64,7 @@ static void SystemClock_Config(void);
 static void Error_Handler(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
+void oncePerSecond(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -77,7 +80,7 @@ int main(void)
 		These functions are provided as template implementation that User may integrate 
 		in his application, to enhance the performance in case of use of AXI interface 
 		with several masters. */ 
-  
+
 	/* Configure the MPU attributes as Write Through */
 	MPU_Config();
 
@@ -104,32 +107,51 @@ int main(void)
 	Debug_USART_printf("time to party!\n\r");
 	Disco_Term_Read_Debug("time to party!");
 
+	oncePerSecond();
+
 	// Infinite loop
-	uint8_t counter = 0;
+	static uint32_t lastEventTime = 0;
+	while(1){
+		Disco_Codec_Loop(); // process audio loop
+		BSP_LED_On(LED1);
+		if( (uwTick - lastEventTime) > 1000 ){
+			// once per second
+			lastEventTime = uwTick;
+			oncePerSecond();
+		} else if( uwTick < lastEventTime ){
+			// OVERFLOW
+			lastEventTime = uwTick;
+		}
+	}
+}
+
+void oncePerSecond(void)
+{
+	static uint8_t flip;
+	static uint8_t counter;
 	char count[2] = { '0', '\0'}; // Manual String generation
-
-	while (1)
-	{
-		// Disco_Codec_Loop();
-
-	// below is terminal test case
-		Disco_HW_Loop();
-		HAL_Delay(600);
+	
+	Disco_HW_Loop();
+	
+	if(!flip){
+		// READ
+		BSP_LED_Toggle(LED2);
 		counter++;
-		if(counter > 8) {
+		if(counter > 9) {
 			counter = 0;
 		}
 		count[0] = counter+48;
 		Disco_Term_Read_String(count);
-		
-		HAL_Delay(600);
-		// Echo Terminal EVAL over usart
-    char eval_to_str[51];
+	} else {
+		// EVAL
+		char eval_to_str[51];
 		strcpy( eval_to_str, Disco_Term_Eval() );
-    strcat( eval_to_str, "\n\r" );
-    Debug_USART_printf( eval_to_str );
+		strcat( eval_to_str, "\n\r" );
+		Debug_USART_printf( eval_to_str );
 	}
+	flip ^= 1;
 }
+
 
 /**
   * @brief  System Clock Configuration

@@ -5,7 +5,8 @@
 
 // public declaration for use in transmit function
 USART_HandleTypeDef handusart;
-__IO ITStatus uReady = RESET;
+// __IO ITStatus uReady = RESET;
+unsigned char USART_Rx_Buf[51];
 
 void Debug_USART_Init(void)
 {
@@ -15,7 +16,7 @@ void Debug_USART_Init(void)
 	handusart.Init.WordLength 		= USART_WORDLENGTH_8B;
 	handusart.Init.StopBits 		= USART_STOPBITS_1;
 	handusart.Init.Parity 			= USART_PARITY_NONE;
-	handusart.Init.Mode 			= USART_MODE_TX;
+	handusart.Init.Mode 			= USART_MODE_TX_RX;
 	HAL_USART_Init( &handusart );
 }
 
@@ -74,23 +75,28 @@ void HAL_USART_MspInit(USART_HandleTypeDef *hu )
 
 	HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
 	HAL_NVIC_EnableIRQ(USARTx_IRQn);
+
+	HAL_USART_Receive_DMA( &handusart, USART_Rx_Buf, 5);
 }
 
 void USARTx_DMA_RX_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(handusart.hdmarx);
+	BSP_LED_On(LED1);
+	HAL_DMA_IRQHandler(handusart.hdmarx);
 }
 void USARTx_DMA_TX_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(handusart.hdmatx);
+	HAL_DMA_IRQHandler(handusart.hdmatx);
 }
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
 {
 	// Disco_Term_Read_Debug("TxCpltCallback");
+	BSP_LED_Toggle(LED2);
+	HAL_USART_Receive_DMA( husart, USART_Rx_Buf, 5);
 }
 void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart)
 {
-	// Disco_Term_Read_Debug("RxCpltCallback");
+	BSP_LED_On(LED1);
 }
 void USARTx_IRQHandler(void)
 {
@@ -110,6 +116,8 @@ void Debug_USART_putc(unsigned char c)
 void Debug_USART_printf(char *s)
 {
 	HAL_USART_Transmit_DMA( &handusart, s, strlen(s) );
+
+	// Disco_Term_Read_Debug(USART_Rx_Buf);
 }
 
 void Debug_USART_putn(uint32_t n)

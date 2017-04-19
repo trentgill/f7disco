@@ -3,6 +3,7 @@ EXECUTABLE=main.elf
 
 CUBE=../STM32Cube_FW_F7_V1.6.0/Drivers
 HALS=STM32F7xx_HAL_Driver/Src
+WRLIB=../../wrLib
 # $(PRJ_DIR) = /f7disco
 
 CC=arm-none-eabi-gcc
@@ -61,7 +62,9 @@ SRC = main.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c \
 	$(CUBE)/BSP/Components/otm8009a/otm8009a.c \
 	$(CUBE)/BSP/Components/wm8994/wm8994.c \
+	$(WRLIB)/wrLpGate.c \
 	lib/*.c
+
 
 OBJDIR = .
 OBJ = $(SRC:%.c=$(OBJDIR)/%.o) 
