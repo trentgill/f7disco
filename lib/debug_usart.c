@@ -122,17 +122,18 @@ void Debug_USART_printf(char *s)
 
 void Debug_USART_putn(uint32_t n)
 {
+	char str[13] = "\n\r0xFFFFFFFF";
 	uint8_t temp;
-	Debug_USART_printf("\n\r0x");
 	for(int8_t i=7; i>=0; i--){
 		temp = n >> (i<<2);
 		temp &= 0x0000000F; // mask lowest nibble
 		if(temp<10) { // numeric
-			Debug_USART_putc((char)48+temp);
+			str[i+4] = 48+temp;
 		} else { // alpha
-			Debug_USART_putc((char)55+temp);
+			str[i+4] = 55+temp;
 		}
 	}
+	Debug_USART_printf(str);
 }
 
 void Debug_USART_putn8(uint8_t n)

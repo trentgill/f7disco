@@ -73,6 +73,14 @@ void oncePerSecond(void);
   * @param  None
   * @retval None
   */
+__IO float master_pitch;
+__IO float master_mod;
+extern uint8_t DSP_Dirty;
+
+// const float m_pitches[4] = {1, 5/3, 10/9, 3/2};
+const float m_pitches[4] = {1, 1.66667, 1.11111, 1.5};
+const float m_modrates[5] = {1,0.72,0.3,1.3,1.7};
+
 int main(void)
 {
 	/* This project template calls firstly two functions in order to configure MPU feature 
@@ -102,18 +110,22 @@ int main(void)
 	Debug_USART_Init();
 	Disco_HW_Init();	
 	Disco_Codec_Init();
-
+HAL_Delay(100);
 	// Debug Boot messages
-	Debug_USART_printf("time to party!\n\r");
+	// Debug_USART_printf("time to party!\n\r");
 	Disco_Term_Read_Debug("time to party!");
 
 	oncePerSecond();
 
 	// Infinite loop
 	static uint32_t lastEventTime = 0;
+	static uint8_t lastButton;
+	static uint8_t p_count, m_count;
+	char state[4] = { '0', ' ', '0', '\0' };
+
 	while(1){
 		Disco_Codec_Loop(); // process audio loop
-		BSP_LED_On(LED1);
+		// BSP_LED_On(LED1);
 		if( (uwTick - lastEventTime) > 1000 ){
 			// once per second
 			lastEventTime = uwTick;
@@ -122,6 +134,20 @@ int main(void)
 			// OVERFLOW
 			lastEventTime = uwTick;
 		}
+
+		uint8_t press = BSP_PB_GetState(0);
+
+		if( (lastButton != press) && (press == 1) ){
+			master_pitch   = m_pitches[p_count++];
+			master_mod     = m_modrates[m_count++];
+			DSP_Dirty      = 1;
+			if(p_count >= 4){ p_count = 0; }
+			if(m_count >= 5){ m_count = 0; }
+			state[0] = p_count+48;
+			state[2] = m_count+48;
+			Disco_Term_Read_Debug(state);
+		}
+		lastButton = press;
 	}
 }
 

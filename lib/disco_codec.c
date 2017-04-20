@@ -106,7 +106,9 @@ void Disco_Codec_Loop(void)
 		int position = UpdatePointer; // 0 or PLAY_HALF_BUFF
 		UpdatePointer = -1; // reset flag
 
+		BSP_LED_On(LED1);
 		DSP_Block_Process(NULL, &PlayBuff[position], DSP_BLOCK_SIZE);
+		BSP_LED_Off(LED1);
 
 		if( UpdatePointer != -1 ){
 			// new callback interrupt occured during dsp_block

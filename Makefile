@@ -63,6 +63,8 @@ SRC = main.c \
 	$(CUBE)/BSP/Components/otm8009a/otm8009a.c \
 	$(CUBE)/BSP/Components/wm8994/wm8994.c \
 	$(WRLIB)/wrLpGate.c \
+	$(WRLIB)/wrFuncGen.c \
+	$(WRLIB)/wrMath.c \
 	lib/*.c
 
 
