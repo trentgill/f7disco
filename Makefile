@@ -4,6 +4,7 @@ EXECUTABLE=main.elf
 CUBE=../STM32Cube_FW_F7_V1.6.0/Drivers
 HALS=STM32F7xx_HAL_Driver/Src
 WRLIB=../../wrLib
+LUAS=../../lua-5.3.4/src
 # $(PRJ_DIR) = /f7disco
 
 CC=arm-none-eabi-gcc
@@ -26,7 +27,10 @@ STM32_INCLUDES = \
 	-I$(CUBE)/CMSIS/Include/ \
 	-I$(CUBE)/BSP/Components/ \
 	-I$(CUBE)/BSP/STM32F769I-Discovery/ \
-	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/
+	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/ \
+	-I$(LUALIB)/include/
+
+# note: /usr/include/luaconf.h has the "include lua5.3-deb-multiarch.h" line commented out
 
 OPTIMIZE       = -O3
 
@@ -65,7 +69,8 @@ SRC = main.c \
 	$(WRLIB)/wrLpGate.c \
 	$(WRLIB)/wrFuncGen.c \
 	$(WRLIB)/wrMath.c \
-	lib/*.c
+	lib/*.c \
+
 
 
 OBJDIR = .

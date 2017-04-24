@@ -40,6 +40,11 @@
 #include <stdio.h>
 
 #include "main.h"
+  
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
 #include "lib/disco_term.h"
@@ -83,73 +88,102 @@ const float m_modrates[5] = {1,0.72,0.3,1.3,1.7};
 
 int main(void)
 {
-	/* This project template calls firstly two functions in order to configure MPU feature 
-		and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().
-		These functions are provided as template implementation that User may integrate 
-		in his application, to enhance the performance in case of use of AXI interface 
-		with several masters. */ 
+  /* This project template calls firstly two functions in order to configure MPU feature 
+    and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().
+    These functions are provided as template implementation that User may integrate 
+    in his application, to enhance the performance in case of use of AXI interface 
+    with several masters. */ 
 
-	/* Configure the MPU attributes as Write Through */
-	MPU_Config();
+  /* Configure the MPU attributes as Write Through */
+  MPU_Config();
 
-	/* Enable the CPU Cache */
-	CPU_CACHE_Enable();
+  /* Enable the CPU Cache */
+  CPU_CACHE_Enable();
 
-	/* STM32F7xx HAL library initialization:
-		- Configure the Flash ART accelerator on ITCM interface
-		- Configure the Systick to generate an interrupt each 1 msec
-		- Set NVIC Group Priority to 4
-		- Low Level Initialization
-	*/
-	HAL_Init();
+  /* STM32F7xx HAL library initialization:
+    - Configure the Flash ART accelerator on ITCM interface
+    - Configure the Systick to generate an interrupt each 1 msec
+    - Set NVIC Group Priority to 4
+    - Low Level Initialization
+  */
+  HAL_Init();
 
-	/* Configure the system clock to !216-> 200(for screen) MHz */
-	SystemClock_Config();
+  /* Configure the system clock to !216-> 200(for screen) MHz */
+  SystemClock_Config();
 
-	// HW initialization
-	Debug_USART_Init();
-	Disco_HW_Init();	
-	Disco_Codec_Init();
-HAL_Delay(100);
-	// Debug Boot messages
-	// Debug_USART_printf("time to party!\n\r");
-	Disco_Term_Read_Debug("time to party!");
+  // HW initialization
+  Debug_USART_Init();
+  Disco_HW_Init();  
+  Disco_Codec_Init();
+  
+  // APPLICATION CODE
+  char buff[256];
+  int error;
+  lua_State *L = luaL_newstate();   /* opens Lua */
+  luaL_openlibs(L);
 
-	oncePerSecond();
+  while (fgets(buff, sizeof(buff), stdin) != NULL) {
+    error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
+            lua_pcall(L, 0, 0, 0);
+    if (error) {
+      // fprintf(stderr, "%s", lua_tostring(L, -1));
+      Debug_USART_printf(lua_tostring(L, -1));
+      lua_pop(L, 1);  /* pop error message from the stack */
+    }
+  }
+  lua_close(L);
 
-	// Infinite loop
-	static uint32_t lastEventTime = 0;
-	static uint8_t lastButton;
-	static uint8_t p_count, m_count;
-	char state[4] = { '0', ' ', '0', '\0' };
+  HAL_Delay(100);
+  // Debug Boot messages
+  // Debug_USART_printf("time to party!\n\r");
+  // Disco_Term_Read_Debug("time to party!");
 
-	while(1){
-		Disco_Codec_Loop(); // process audio loop
-		// BSP_LED_On(LED1);
-		if( (uwTick - lastEventTime) > 1000 ){
-			// once per second
-			lastEventTime = uwTick;
-			oncePerSecond();
-		} else if( uwTick < lastEventTime ){
-			// OVERFLOW
-			lastEventTime = uwTick;
-		}
+  // oncePerSecond();
 
-		uint8_t press = BSP_PB_GetState(0);
+  // Infinite loop
+  static uint32_t lastEventTime = 0;
+  static uint8_t lastButton;
+  static uint8_t p_count, m_count;
+  char state[4] = { '0', ' ', '0', '\0' };
 
-		if( (lastButton != press) && (press == 1) ){
-			master_pitch   = m_pitches[p_count++];
-			master_mod     = m_modrates[m_count++];
-			DSP_Dirty      = 1;
-			if(p_count >= 4){ p_count = 0; }
-			if(m_count >= 5){ m_count = 0; }
-			state[0] = p_count+48;
-			state[2] = m_count+48;
-			Disco_Term_Read_Debug(state);
-		}
-		lastButton = press;
-	}
+  while(1){
+    // Disco_Codec_Loop(); // process audio loop
+    // BSP_LED_On(LED1);
+    if( (uwTick - lastEventTime) > 1000 ){
+      // once per second
+      lastEventTime = uwTick;
+      oncePerSecond();
+    } else if( uwTick < lastEventTime ){
+      // OVERFLOW
+      lastEventTime = uwTick;
+    }
+
+    uint8_t press = BSP_PB_GetState(0);
+
+    if( (lastButton != press) && (press == 1) ){
+      master_pitch   = m_pitches[p_count++];
+      master_mod     = m_modrates[m_count++];
+      DSP_Dirty      = 1;
+      if(p_count >= 4){ p_count = 0; }
+      if(m_count >= 5){ m_count = 0; }
+      state[0] = p_count+48;
+      state[2] = m_count+48;
+      Disco_Term_Read_Debug(state);
+    }
+    lastButton = press;
+  }
+
+  return 0;
 }
+
+/*void error (lua_State *L, const char *fmt, ...) {
+  va_list argp;
+  va_start(argp, fmt);
+  vfprintf(stderr, argp);
+  va_end(argp);
+  lua_close(L);
+  exit(EXIT_FAILURE);
+}*/
 
 void oncePerSecond(void)
 {
