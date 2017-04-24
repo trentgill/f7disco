@@ -4,8 +4,7 @@
 #include "dsp_block.h"
 
 // Private defines
-#define DSP_BLOCK_SIZE		1024
-	// this is matched to hardcoded val in i2c audio driver(?)
+#define DSP_BLOCK_SIZE		32
 #define PLAY_HALF_BUFF		(DSP_BLOCK_SIZE*2) // stereo
 #define PLAY_BUFF_SIZE		(PLAY_HALF_BUFF*2) // double-buff
 

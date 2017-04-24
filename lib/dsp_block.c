@@ -77,8 +77,8 @@ void DSP_Block_Process(uint16_t* in_codec, uint16_t* out_codec, uint16_t b_size)
 
 		// clip output & copy to left & right
 		// out[1][i] = out[0][i] = lim_f(mix[i], -1.0, 1.0);
-		out[0][i] = lim_f(3*out[0][i], -0.99, 0.99);
-		out[1][i] = lim_f(3*out[1][i], -0.99, 0.99);
+		out[0][i] = lim_f(out[0][i], -0.99, 0.99);
+		out[1][i] = lim_f(out[1][i], -0.99, 0.99);
 	}
 
 	array_to_codec(out[0], out[1], out_codec, b_size);
