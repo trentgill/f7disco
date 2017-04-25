@@ -21,25 +21,28 @@ DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F7XX -DARM_MATH_CM7 -DHSE_VALUE=25000000
 STARTUP = $(CUBE)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f769xx.s
 
 MCU = cortex-m4
-MCFLAGS = -mcpu=$(MCU) -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb-interwork -std=c99
+MCFLAGS = -march=armv7e-m -mthumb 
+
 STM32_INCLUDES = \
 	-I$(CUBE)/CMSIS/Device/ST/STM32F7xx/Include/ \
 	-I$(CUBE)/CMSIS/Include/ \
 	-I$(CUBE)/BSP/Components/ \
 	-I$(CUBE)/BSP/STM32F769I-Discovery/ \
 	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/ \
-	-I$(LUALIB)/include/
+	-I/usr/local/include/
 
 # note: /usr/include/luaconf.h has the "include lua5.3-deb-multiarch.h" line commented out
 
 OPTIMIZE       = -O3
 
-CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I. -I./ $(STM32_INCLUDES)
-
-# AFLAGS	= $(MCFLAGS) -mapcs-float
-#-mapcs-float use float regs. small increase in code size
+CFLAGS += -std=c99
+CFLAGS += -DLUA_32BITS -DLUA_COMPAT_5_2
+CFLAGS += $(MCFLAGS)
+CFLAGS += $(OPTIMIZE)
+CFLAGS += $(DEFS) -I. -I./ $(STM32_INCLUDES)
 
 LDFLAGS = -Wl,-T,stm32_flash.ld
+LIBS = -lm -lc -lnosys
 
 SRC = main.c \
 	stm32f7xx_it.c \
@@ -74,9 +77,14 @@ SRC = main.c \
 	$(wildcard lib/*.c)
 
 
+LUACORE_OBJS=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
+	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
+	ltm.o lundump.o lvm.o lzio.o
+LUALIB_OBJS=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
+	lmathlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o
 
 OBJDIR = .
-OBJS = $(SRC:%.c=$(OBJDIR)/%.o) 
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o) $(addprefix ../lua-5.3.4/src/,$(LUACORE_OBJS) $(LUALIB_OBJS) )
 OBJS += Startup.o
 
 all: $(TARGET).hex
@@ -85,10 +93,10 @@ $(TARGET).hex: $(EXECUTABLE)
 	$(CP) -O ihex $^ $@
 
 $(EXECUTABLE): $(OBJS)
-	$(CC) -g $(LDFLAGS) $^ -lm -lc -lnosys -o $@
+	$(LD) -g $(MCFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 	$(OBJDUMP) --disassemble $@ > $@.lst
 
-%.o: %.c Makefile
+%.o: %.c
 	$(CC) -ggdb $(CFLAGS) -c $< -o $@
 
 %.s: %.c

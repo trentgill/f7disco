@@ -7,6 +7,7 @@ DS_Store
 *.obj
 *.elf
 *.d
+*.dmp
 
 # Precompiled Headers
 *.gch

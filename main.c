@@ -41,9 +41,9 @@
 
 #include "main.h"
   
-// #include <lua.h>
-// #include <lauxlib.h>
-// #include <lualib.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
@@ -117,21 +117,23 @@ int main(void)
   Disco_Codec_Init();
   
   // APPLICATION CODE
-  // char buff[256];
-  // int error;
-  // lua_State *L = luaL_newstate();   /* opens Lua */
-  // luaL_openlibs(L);
+  char buff[256] = "some long string";
+  int error;
+  lua_State *L = luaL_newstate();   /* opens Lua */
+  luaL_openlibs(L);
 
-  // while (fgets(buff, sizeof(buff), stdin) != NULL) {
-  //   error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
-  //           lua_pcall(L, 0, 0, 0);
-  //   if (error) {
-  //     // fprintf(stderr, "%s", lua_tostring(L, -1));
-  //     Debug_USART_printf(lua_tostring(L, -1));
-  //     lua_pop(L, 1);  /* pop error message from the stack */
-  //   }
+  // {
+    error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
+            lua_pcall(L, 0, 0, 0);
+    if (error) {
+      // fprintf(stderr, "%s", lua_tostring(L, -1));
+      Debug_USART_printf(lua_tostring(L, -1));
+      lua_pop(L, 1);  /* pop error message from the stack */
+    } else {
+      Debug_USART_printf("hi! it's lua");
+    }
   // }
-  // lua_close(L);
+  lua_close(L);
 
   HAL_Delay(100);
   // Debug Boot messages
