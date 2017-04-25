@@ -40,3 +40,5 @@ DS_Store
 
 # Debug files
 *.dSYM/
+*.lst
+*.s

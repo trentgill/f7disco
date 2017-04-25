@@ -12,7 +12,7 @@ LD=arm-none-eabi-gcc
 AR=arm-none-eabi-ar
 AS=arm-none-eabi-as
 CP=arm-none-eabi-objcopy
-OD=arm-none-eabi-objdump
+OBJDUMP=arm-none-eabi-objdump
 
 # BIN=$(CP) -O ihex 
 BIN = $(TARGET).bin
@@ -21,7 +21,7 @@ DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F7XX -DARM_MATH_CM7 -DHSE_VALUE=25000000
 STARTUP = $(CUBE)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f769xx.s
 
 MCU = cortex-m4
-MCFLAGS = -mcpu=$(MCU) -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb-interwork -std=c99
+MCFLAGS = -mcpu=$(MCU) -mthumb -mlittle-endian -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb-interwork -std=c99
 STM32_INCLUDES = \
 	-I$(CUBE)/CMSIS/Device/ST/STM32F7xx/Include/ \
 	-I$(CUBE)/CMSIS/Include/ \
@@ -34,10 +34,12 @@ STM32_INCLUDES = \
 
 OPTIMIZE       = -O3
 
-CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I. -I./ $(STM32_INCLUDES)  -Wl,-T,stm32_flash.ld
+CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I. -I./ $(STM32_INCLUDES)
 
-AFLAGS	= $(MCFLAGS) -mapcs-float
+# AFLAGS	= $(MCFLAGS) -mapcs-float
 #-mapcs-float use float regs. small increase in code size
+
+LDFLAGS = -Wl,-T,stm32_flash.ld
 
 SRC = main.c \
 	stm32f7xx_it.c \
@@ -69,24 +71,34 @@ SRC = main.c \
 	$(WRLIB)/wrLpGate.c \
 	$(WRLIB)/wrFuncGen.c \
 	$(WRLIB)/wrMath.c \
-	lib/*.c \
+	$(wildcard lib/*.c)
 
 
 
 OBJDIR = .
-OBJ = $(SRC:%.c=$(OBJDIR)/%.o) 
-OBJ += Startup.o
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o) 
+OBJS += Startup.o
 
 all: $(TARGET).hex
 
 $(TARGET).hex: $(EXECUTABLE)
 	$(CP) -O ihex $^ $@
 
-$(EXECUTABLE): $(SRC) $(STARTUP)
-	$(CC) -g $(CFLAGS) $^ -lm -lc -lnosys -o $@
+$(EXECUTABLE): $(OBJS)
+	$(CC) -g $(LDFLAGS) $^ -lm -lc -lnosys -o $@
+	$(OBJDUMP) --disassemble $@ > $@.lst
+
+%.o: %.c Makefile
+	$(CC) -ggdb $(CFLAGS) -c $< -o $@
+
+%.s: %.c
+	$(CC) -ggdb $(CFLAGS) -S $< -o $@
+
+Startup.o: $(STARTUP)
+	$(CC) -ggdb $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f Startup.lst $(TARGET).lst $(OBJ) $(AUTOGEN)  $(TARGET).out  $(TARGET).hex  $(TARGET).map \
+	rm -f Startup.lst $(TARGET).lst $(OBJS) $(AUTOGEN)  $(TARGET).out  $(TARGET).hex  $(TARGET).map \
 	 $(TARGET).dmp  $(EXECUTABLE)
 
 flash: $(BIN)
@@ -94,7 +106,7 @@ flash: $(BIN)
 
 $(BIN): $(EXECUTABLE)
 	$(CP) -O binary $< $@
-	$(OD) -x --syms $< > $(addsuffix .dmp, $(basename $<))
+	$(OBJDUMP) -x --syms $< > $(addsuffix .dmp, $(basename $<))
 	ls -l $@ $<
 
 wav: fsk-wav
