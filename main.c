@@ -150,7 +150,7 @@ int main(void)
 
   HAL_Delay(100);
   // Debug Boot messages
-  // Debug_USART_printf("time to party!\n\r");
+  Debug_USART_printf("time to party!\n\r");
   // Disco_Term_Read_Debug("time to party!");
 
   oncePerSecond();
@@ -162,9 +162,9 @@ int main(void)
   char state[4] = { '0', ' ', '0', '\0' };
 
   while(1){
-    Disco_Codec_Loop(); // process audio loop
+    // Disco_Codec_Loop(); // process audio loop
     // BSP_LED_On(LED1);
-    /*if( (uwTick - lastEventTime) > 1000 ){
+    if( (uwTick - lastEventTime) > 1000 ){
       // once per second
       lastEventTime = uwTick;
       oncePerSecond();
@@ -185,7 +185,7 @@ int main(void)
       state[2] = m_count+48;
       Disco_Term_Read_Debug(state);
     }
-    lastButton = press;*/
+    lastButton = press;
   }
 
   return 0;
