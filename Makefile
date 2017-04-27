@@ -20,7 +20,6 @@ BIN = $(TARGET).bin
 DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F7XX -DARM_MATH_CM7 -DHSE_VALUE=25000000
 STARTUP = $(CUBE)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f769xx.s
 
-MCU = cortex-m4
 MCFLAGS = -march=armv7e-m -mthumb 
 
 STM32_INCLUDES = \
@@ -31,6 +30,7 @@ STM32_INCLUDES = \
 	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/ \
 	-I/usr/local/include/
 
+# note: the line above includes the lua header files. is there a better approach?
 # note: /usr/include/luaconf.h has the "include lua5.3-deb-multiarch.h" line commented out
 
 OPTIMIZE       = -O3
@@ -96,6 +96,14 @@ $(EXECUTABLE): $(OBJS)
 	$(LD) -g $(MCFLAGS) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 	$(OBJDUMP) --disassemble $@ > $@.lst
 
+$(BIN): $(EXECUTABLE)
+	$(CP) -O binary $< $@
+	$(OBJDUMP) -x --syms $< > $(addsuffix .dmp, $(basename $<))
+	ls -l $@ $<
+
+flash: $(BIN)
+	st-flash write $(BIN) 0x08000000
+
 %.o: %.c
 	$(CC) -ggdb $(CFLAGS) -c $< -o $@
 
@@ -104,18 +112,6 @@ $(EXECUTABLE): $(OBJS)
 
 Startup.o: $(STARTUP)
 	$(CC) -ggdb $(CFLAGS) -c $< -o $@
-
-clean:
-	rm -f Startup.lst $(TARGET).lst $(OBJS) $(AUTOGEN)  $(TARGET).out  $(TARGET).hex  $(TARGET).map \
-	 $(TARGET).dmp  $(EXECUTABLE)
-
-flash: $(BIN)
-	st-flash write $(BIN) 0x08000000
-
-$(BIN): $(EXECUTABLE)
-	$(CP) -O binary $< $@
-	$(OBJDUMP) -x --syms $< > $(addsuffix .dmp, $(basename $<))
-	ls -l $@ $<
 
 wav: fsk-wav
 
@@ -128,3 +124,8 @@ fsk-wav: $(BIN)
 	cd .. && python stm-audio-bootloader/fsk/encoder.py \
 		-s 48000 -b 16 -n 8 -z 4 -p 256 -g 16384 -k 1800 \
 		$(PRJ_DIR)/$(BIN)
+
+clean:
+	rm -f Startup.lst $(TARGET).lst $(OBJS) $(AUTOGEN)  $(TARGET).out  $(TARGET).hex  $(TARGET).map \
+	 $(TARGET).dmp  $(EXECUTABLE)
+
