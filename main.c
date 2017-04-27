@@ -71,8 +71,6 @@ static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 void oncePerSecond(void);
 
-static void stackDump (lua_State *L);
-
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -90,27 +88,10 @@ const float m_modrates[5] = {1,0.72,0.3,1.3,1.7};
 
 int main(void)
 {
-  /* This project template calls firstly two functions in order to configure MPU feature 
-    and to enable the CPU Cache, respectively MPU_Config() and CPU_CACHE_Enable().
-    These functions are provided as template implementation that User may integrate 
-    in his application, to enhance the performance in case of use of AXI interface 
-    with several masters. */ 
-
-  /* Configure the MPU attributes as Write Through */
+  // Configure low-level
   MPU_Config();
-
-  /* Enable the CPU Cache */
   CPU_CACHE_Enable();
-
-  /* STM32F7xx HAL library initialization:
-    - Configure the Flash ART accelerator on ITCM interface
-    - Configure the Systick to generate an interrupt each 1 msec
-    - Set NVIC Group Priority to 4
-    - Low Level Initialization
-  */
   HAL_Init();
-
-  /* Configure the system clock to !216-> 200(for screen) MHz */
   SystemClock_Config();
 
   // HW initialization
@@ -119,24 +100,21 @@ int main(void)
   Disco_Codec_Init();
   
   // APPLICATION CODE
-  char buff[12] = "some string";
-  int error;
-  lua_State *L = luaL_newstate();   /* opens Lua */
+/*  char buff[12] = "some string\0";
+  lua_State *L = luaL_newstate();
   luaL_openlibs(L);
-
-  // lua interpreter does addition for C ;)
-  (luaL_loadstring(L, "return (2 + 3)") || lua_pcall(L, 0, LUA_MULTRET, 0));
+  luaL_dostring(L, "return (4*2)");
   Debug_USART_printf(lua_tostring(L, -1));
 
-  lua_close(L);
-
+  lua_close(L);*/
 
   HAL_Delay(100);
-  // Debug Boot messages
   Debug_USART_printf("time to party!\n\r");
-  // Disco_Term_Read_Debug("time to party!");
 
   oncePerSecond();
+// Debug_USART_printf("888\n\r");
+
+
 
   // Infinite loop
   static uint32_t lastEventTime = 0;
@@ -146,7 +124,7 @@ int main(void)
 
   while(1){
     // Disco_Codec_Loop(); // process audio loop
-    // BSP_LED_On(LED1);
+
     if( (uwTick - lastEventTime) > 1000 ){
       // once per second
       lastEventTime = uwTick;
@@ -156,8 +134,8 @@ int main(void)
       lastEventTime = uwTick;
     }
 
-    uint8_t press = BSP_PB_GetState(0);
-
+    // hacked synthesis settings change
+    /*uint8_t press = BSP_PB_GetState(0);
     if( (lastButton != press) && (press == 1) ){
       master_pitch   = m_pitches[p_count++];
       master_mod     = m_modrates[m_count++];
@@ -168,36 +146,44 @@ int main(void)
       state[2] = m_count+48;
       Disco_Term_Read_Debug(state);
     }
-    lastButton = press;
+    lastButton = press;*/
   }
 
   return 0;
 }
 
 
+uint16_t inker = 0;
 void oncePerSecond(void)
 {
-	static uint8_t flip;
-	static uint8_t counter;
-	char count[2] = { '0', '\0'}; // Manual String generation
-	
+  static uint8_t flip;
+  unsigned char strung[51] = "333\0";
+  // Debug_USART_printf( strung );
 	Disco_HW_Loop();
 	
+  // HAL_Delay(100);
 	if(!flip){
 		// READ
-		BSP_LED_Toggle(LED2);
-		counter++;
-		if(counter > 9) {
-			counter = 0;
-		}
-		count[0] = counter+48;
-		Disco_Term_Read_String(count);
+		// char buf[20];
+    // itoa(inker, buf, 10);
+    
+    // strcpy(strung, buf);
+    // Disco_Term_Read_String(strung);
+    
+    itoa(inker, strung, 10);
+    strcat(strung, " + 1\0");
+    Disco_Term_Read_String(strung);
 	} else {
+
 		// EVAL
-		char eval_to_str[51];
-		strcpy( eval_to_str, Disco_Term_Eval() );
-		strcat( eval_to_str, "\n\r" );
-		Debug_USART_printf( eval_to_str );
+    // Debug_USART_printf( Disco_Term_Eval() );
+		// Disco_Term_Eval();
+    strcpy( strung, Disco_Term_Eval() );
+		inker = atoi(strung);
+    
+    // debug
+    strcat( strung, "\n\r" );
+		Debug_USART_printf( strung );
 	}
 	flip ^= 1;
 }

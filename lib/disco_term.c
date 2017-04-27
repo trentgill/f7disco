@@ -2,12 +2,16 @@
 #include "disco_term.h"
 #include "debug_usart.h"
 
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 extern DSI_HandleTypeDef hdsi_discovery;
 
 typedef struct term {
 	unsigned char 	line[TERM_MAX_LINES][TERM_CHARS_P_L];
 	unsigned char 	prompt[TERM_CHARS_P_L]; // << sloppy
-	uint8_t 		ix_read;
+	uint8_t 		ix_eval;
 	// uint8_t			ix_len;
 } term_t;
 
@@ -26,6 +30,12 @@ void Disco_Term_Splash(void)
 	BSP_LCD_SetFont(&Font24);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // white on blue
+
+	// clear buffers
+	strcpy( dterm.prompt, "> \0\0" );
+	for(uint8_t i=0; i<TERM_MAX_LINES; i++){
+		strcpy( dterm.line[i], " \0\0" );
+	}
 }
 
 // REPL
@@ -41,19 +51,19 @@ void Disco_Term_Draw_Prompt( void )
 // Public Definitions 
 void Disco_Term_Read_String(unsigned char* s)
 {
-	strcpy( dterm.prompt, "> " );
+	strcpy( dterm.prompt, "> \0" ); // rm this line
 	strcat( dterm.prompt, s );
 
 	Disco_Term_Draw_Prompt();
 }
 
-void Disco_Term_Read_Char(unsigned char c)
+void Disco_Term_Read_Char(unsigned char* c)
 {
 	// leave space for >, " ", <new char>, and \0
-	if( strlen(dterm.prompt) < TERM_CHARS_P_L-4 ){
-		strncat( dterm.prompt, &c, 1 ); // append single char
+	// strncat( dterm.prompt, c, 1 ); // append single char
+	/*if( strlen(dterm.prompt) < TERM_CHARS_P_L-4 ){
 	} else { ;; } // data entry error
-
+*/
 	Disco_Term_Draw_Prompt();
 }
 
@@ -68,7 +78,8 @@ void Disco_Term_Read_Backspace(void)
 
 void Disco_Term_Read_Clear(void)
 {
-	strcpy( dterm.prompt, "> " );
+	// inserts "plus 1" so any number will be incremented
+	strcpy( dterm.prompt, "> \0" );
 
 	Disco_Term_Draw_Prompt();
 }
@@ -89,29 +100,50 @@ void Disco_Term_Read_Debug(unsigned char* s)
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 }
 
-unsigned char* Disco_Term_Eval(void)
+void Disco_Term_Redraw_History(int8_t row)
 {
-	uint8_t i;
+	for( uint8_t i=0; i<(TERM_MAX_LINES-2); i++ ){
+		uint8_t line = 17 - (i*2); // count up from bottom(17)
 
-	// currently just a ring buffer (ie always full)
-	for( i=0; i<(strlen(dterm.prompt)-2); i++) { // ignore leading "> "
-		dterm.line[dterm.ix_read][i] = dterm.prompt[i+2];
-	} dterm.line[dterm.ix_read][i] = '\0'; // null terminate string (???)
-
-	int8_t row = dterm.ix_read;
-	for( i=0; i<(TERM_MAX_LINES-2); i++ ){
-		uint8_t tum = 17 - (i*2); // 1st line above prompt
-
-		BSP_LCD_ClearStringLine(tum);
-		BSP_LCD_DisplayStringAtLine(tum, dterm.line[row]);
+		BSP_LCD_ClearStringLine(line);
+		BSP_LCD_DisplayStringAtLine(line, dterm.line[row]);
 
 		row--; if( row<0 ){ row += TERM_MAX_LINES; }
 	}
-	Disco_Term_Read_Clear(); // clear prompt & redraw screen
+}
 
-	row = dterm.ix_read;
-	dterm.ix_read++;
-	if( dterm.ix_read > (TERM_MAX_LINES-1) ) { dterm.ix_read = 0; }
+unsigned char* Disco_Term_Eval(void)
+{
+	// format prompt into string for lua w return
+	char lstring[60] = "return \0";
+	char* firstchar = &(dterm.prompt[2]);
+	strcat(lstring, firstchar);
 
-	return dterm.line[row];
+	lua_State *luaTerm = luaL_newstate();
+	luaL_openlibs(luaTerm);
+	
+	// **EVAL**
+	luaL_dostring(luaTerm, lstring);
+	strcpy(lstring, lua_tostring(luaTerm, -1) );
+	if(strlen(lstring) > TERM_CHARS_P_L) {
+		strncpy(dterm.line[dterm.ix_eval], lstring, 47);
+	} else {
+		strcpy(dterm.line[dterm.ix_eval], lstring);
+	}
+
+	lua_close(luaTerm);
+
+	// redraw history, clear prompt & redraw screen
+	Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
+	Disco_Term_Read_Clear();
+
+	// save ix
+	uint8_t tmp = dterm.ix_eval;
+
+	// move index into line[] buffer
+	dterm.ix_eval++;
+	if( dterm.ix_eval > (TERM_MAX_LINES-1) ) { dterm.ix_eval = 0; }
+
+	// return copy of output
+	return dterm.line[tmp];
 }
