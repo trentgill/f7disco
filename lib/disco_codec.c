@@ -109,10 +109,10 @@ void Disco_Codec_Loop(void)
 		DSP_Block_Process(NULL, &PlayBuff[position], DSP_BLOCK_SIZE);
 		BSP_LED_Off(LED1);
 
-		if( UpdatePointer != -1 ){
+		/*if( UpdatePointer != -1 ){
 			// new callback interrupt occured during dsp_block
 			Debug_USART_printf("dsp out of time!\n\r");
-		}
+		}*/
 	}
 }
 
