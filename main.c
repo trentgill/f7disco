@@ -124,29 +124,12 @@ int main(void)
   lua_State *L = luaL_newstate();   /* opens Lua */
   luaL_openlibs(L);
 
-
-  lua_pushstring(L, buff);
+  // lua interpreter does addition for C ;)
+  (luaL_loadstring(L, "return (2 + 3)") || lua_pcall(L, 0, LUA_MULTRET, 0));
   Debug_USART_printf(lua_tostring(L, -1));
 
-
-
-  // {
-    // error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
-            // lua_pcall(L, 0, 0, 0);
-/*    error = 1;
-    if (error) {
-      // fprintf(stderr, "%s", lua_tostring(L, -1));
-      lua_pushnumber(L, 32);
-      // lua_pushnumber(L, 31);
-      // lua_pushstring(L, buff);
-      // Debug_USART_printf(lua_tostring(L, -1));
-      // stackDump(L);
-      lua_pop(L, 1);  // pop error message from the stack
-    } else {
-      Debug_USART_printf("hi! it's lua");
-    }
-*/  // }
   lua_close(L);
+
 
   HAL_Delay(100);
   // Debug Boot messages
