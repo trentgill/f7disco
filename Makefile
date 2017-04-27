@@ -64,6 +64,7 @@ SRC = main.c \
 	$(CUBE)/$(HALS)/stm32f7xx_hal_sdram.c \
 	$(CUBE)/$(HALS)/stm32f7xx_hal_sai.c \
 	$(CUBE)/$(HALS)/stm32f7xx_hal_usart.c \
+	$(CUBE)/$(HALS)/stm32f7xx_hal_hcd.c \
 	$(CUBE)/$(HALS)/stm32f7xx_ll_fmc.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_audio.c \
