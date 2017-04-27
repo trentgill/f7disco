@@ -100,21 +100,10 @@ int main(void)
   Disco_Codec_Init();
   
   // APPLICATION CODE
-/*  char buff[12] = "some string\0";
-  lua_State *L = luaL_newstate();
-  luaL_openlibs(L);
-  luaL_dostring(L, "return (4*2)");
-  Debug_USART_printf(lua_tostring(L, -1));
-
-  lua_close(L);*/
-
   HAL_Delay(100);
   Debug_USART_printf("time to party!\n\r");
 
-  oncePerSecond();
-// Debug_USART_printf("888\n\r");
-
-
+  oncePerSecond(); // call without waiting
 
   // Infinite loop
   static uint32_t lastEventTime = 0;
@@ -157,27 +146,18 @@ uint16_t inker = 0;
 void oncePerSecond(void)
 {
   static uint8_t flip;
-  unsigned char strung[51] = "333\0";
-  // Debug_USART_printf( strung );
-	Disco_HW_Loop();
+  unsigned char strung[51] = " \0";
+  Disco_HW_Loop();
 	
   // HAL_Delay(100);
 	if(!flip){
 		// READ
-		// char buf[20];
-    // itoa(inker, buf, 10);
-    
-    // strcpy(strung, buf);
-    // Disco_Term_Read_String(strung);
-    
-    itoa(inker, strung, 10);
+		itoa(inker, strung, 10);
     strcat(strung, " + 1\0");
     Disco_Term_Read_String(strung);
 	} else {
 
 		// EVAL
-    // Debug_USART_printf( Disco_Term_Eval() );
-		// Disco_Term_Eval();
     strcpy( strung, Disco_Term_Eval() );
 		inker = atoi(strung);
     

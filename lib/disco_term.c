@@ -78,9 +78,7 @@ void Disco_Term_Read_Backspace(void)
 
 void Disco_Term_Read_Clear(void)
 {
-	// inserts "plus 1" so any number will be incremented
 	strcpy( dterm.prompt, "> \0" );
-
 	Disco_Term_Draw_Prompt();
 }
 
