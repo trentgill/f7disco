@@ -62,12 +62,11 @@ void DSP_Block_Process(uint16_t* in_codec, uint16_t* out_codec, uint16_t b_size)
 		// oscillators & gates
 	for( i=0; i<b_size; i++ ){
 		// level is mapped from /| to |\ at 0.3 gain
-		mix[i] = 0; // clear mix
 		out[0][i] = 0;
 		out[1][i] = 0;
 		for( j=0; j<VOICE_COUNT; j++ ){
-			env[j][i] = 0.2 - 0.2*function_step( &envRamp[j] );
-			osc[j][i] = function_step( &vcoRamp[j] );
+			env[j][i] = 0.2 - 0.2* function_step( &envRamp[j] );
+			osc[j][i] = function_lookup( function_step( &vcoRamp[j] ) );
 			if(j%2 != 0){
 				out[0][i] += lpgate_step( &vcoGate[j], env[j][i], osc[j][i] );
 			} else {

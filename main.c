@@ -71,6 +71,8 @@ static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 void oncePerSecond(void);
 
+static void stackDump (lua_State *L);
+
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -117,22 +119,33 @@ int main(void)
   Disco_Codec_Init();
   
   // APPLICATION CODE
-  char buff[256] = "some long string";
+  char buff[12] = "some string";
   int error;
   lua_State *L = luaL_newstate();   /* opens Lua */
   luaL_openlibs(L);
 
+
+  lua_pushstring(L, buff);
+  Debug_USART_printf(lua_tostring(L, -1));
+
+
+
   // {
-    error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
-            lua_pcall(L, 0, 0, 0);
+    // error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
+            // lua_pcall(L, 0, 0, 0);
+/*    error = 1;
     if (error) {
       // fprintf(stderr, "%s", lua_tostring(L, -1));
-      Debug_USART_printf(lua_tostring(L, -1));
-      lua_pop(L, 1);  /* pop error message from the stack */
+      lua_pushnumber(L, 32);
+      // lua_pushnumber(L, 31);
+      // lua_pushstring(L, buff);
+      // Debug_USART_printf(lua_tostring(L, -1));
+      // stackDump(L);
+      lua_pop(L, 1);  // pop error message from the stack
     } else {
       Debug_USART_printf("hi! it's lua");
     }
-  // }
+*/  // }
   lua_close(L);
 
   HAL_Delay(100);
@@ -149,9 +162,9 @@ int main(void)
   char state[4] = { '0', ' ', '0', '\0' };
 
   while(1){
-    // Disco_Codec_Loop(); // process audio loop
+    Disco_Codec_Loop(); // process audio loop
     // BSP_LED_On(LED1);
-    if( (uwTick - lastEventTime) > 1000 ){
+    /*if( (uwTick - lastEventTime) > 1000 ){
       // once per second
       lastEventTime = uwTick;
       oncePerSecond();
@@ -172,20 +185,12 @@ int main(void)
       state[2] = m_count+48;
       Disco_Term_Read_Debug(state);
     }
-    lastButton = press;
+    lastButton = press;*/
   }
 
   return 0;
 }
 
-/*void error (lua_State *L, const char *fmt, ...) {
-  va_list argp;
-  va_start(argp, fmt);
-  vfprintf(stderr, argp);
-  va_end(argp);
-  lua_close(L);
-  exit(EXIT_FAILURE);
-}*/
 
 void oncePerSecond(void)
 {
