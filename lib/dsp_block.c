@@ -20,7 +20,7 @@ void array_to_codec(float* ch0, float* ch1, uint16_t* codec, uint16_t b_size);
 
 // public functions
 	// NB: snuck some init functions in here :)
-void DSP_Sample_Rate( uint32_t sample_rate, uint16_t b_size )
+void DSP_Block_Init( uint32_t sample_rate, uint16_t b_size )
 {
 	s_rate = sample_rate;
 	for( uint8_t j=0; j<VOICE_COUNT; j++ ){

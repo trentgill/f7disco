@@ -11,7 +11,7 @@
 #define MOD_BASE    0.000007
 
 // public declarations
-void DSP_Sample_Rate( uint32_t sample_rate, uint16_t b_size );
+void DSP_Block_Init( uint32_t sample_rate, uint16_t b_size );
 void DSP_Block_Process( uint16_t* in, uint16_t* out, uint16_t b_size );
 
 #endif
