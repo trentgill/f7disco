@@ -1,10 +1,10 @@
 TARGET=main
 EXECUTABLE=main.elf
 
-CUBE=../STM32Cube_FW_F7_V1.6.0/Drivers
+CUBE=../STM32_Cube_F7/Drivers
 HALS=STM32F7xx_HAL_Driver/Src
 WRLIB=../../wrLib
-LUAS=../../lua-5.3.4/src
+LUAS=../lua/src
 # $(PRJ_DIR) = /f7disco
 
 CC=arm-none-eabi-gcc
@@ -84,7 +84,7 @@ LUALIB_OBJS=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o
 
 OBJDIR = .
-OBJS = $(SRC:%.c=$(OBJDIR)/%.o) $(addprefix ../lua-5.3.4/src/,$(LUACORE_OBJS) $(LUALIB_OBJS) )
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o) $(addprefix $(LUAS)/,$(LUACORE_OBJS) $(LUALIB_OBJS) )
 OBJS += Startup.o
 
 all: $(TARGET).hex
