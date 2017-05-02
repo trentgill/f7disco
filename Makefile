@@ -2,7 +2,8 @@ TARGET=main
 EXECUTABLE=main.elf
 
 CUBE=../STM32Cube_FW_F7_V1.6.0/Drivers
-HALS=STM32F7xx_HAL_Driver/Src
+HALS=$(CUBE)/STM32F7xx_HAL_Driver/Src
+USBHOST=../STM32Cube_FW_F7_V1.6.0/Middlewares/ST/STM32_USB_Host_Library
 WRLIB=../../wrLib
 LUAS=../../lua-5.3.4/src
 # $(PRJ_DIR) = /f7disco
@@ -28,6 +29,8 @@ STM32_INCLUDES = \
 	-I$(CUBE)/BSP/Components/ \
 	-I$(CUBE)/BSP/STM32F769I-Discovery/ \
 	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/ \
+	-I$(USBHOST)/Class/HID/Inc/ \
+	-I$(USBHOST)/Core/Inc/ \
 	-I/usr/local/include/
 
 # note: the line above includes the lua header files. is there a better approach?
@@ -48,30 +51,31 @@ SRC = main.c \
 	stm32f7xx_it.c \
 	system_stm32f7xx.c \
 	stm32f7xx_hal_msp.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_dfsdm.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_cortex.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_rcc.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_rcc_ex.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_gpio.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_pwr_ex.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_i2c.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_ltdc.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_ltdc_ex.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_dma.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_dma2d.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_dsi.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_sdram.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_sai.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_usart.c \
-	$(CUBE)/$(HALS)/stm32f7xx_hal_hcd.c \
-	$(CUBE)/$(HALS)/stm32f7xx_ll_fmc.c \
+	$(HALS)/stm32f7xx_hal.c \
+	$(HALS)/stm32f7xx_hal_dfsdm.c \
+	$(HALS)/stm32f7xx_hal_cortex.c \
+	$(HALS)/stm32f7xx_hal_rcc.c \
+	$(HALS)/stm32f7xx_hal_rcc_ex.c \
+	$(HALS)/stm32f7xx_hal_gpio.c \
+	$(HALS)/stm32f7xx_hal_pwr_ex.c \
+	$(HALS)/stm32f7xx_hal_i2c.c \
+	$(HALS)/stm32f7xx_hal_ltdc.c \
+	$(HALS)/stm32f7xx_hal_ltdc_ex.c \
+	$(HALS)/stm32f7xx_hal_dma.c \
+	$(HALS)/stm32f7xx_hal_dma2d.c \
+	$(HALS)/stm32f7xx_hal_dsi.c \
+	$(HALS)/stm32f7xx_hal_sdram.c \
+	$(HALS)/stm32f7xx_hal_sai.c \
+	$(HALS)/stm32f7xx_hal_usart.c \
+	$(HALS)/stm32f7xx_hal_hcd.c \
+	$(HALS)/stm32f7xx_ll_fmc.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_audio.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c \
 	$(CUBE)/BSP/Components/otm8009a/otm8009a.c \
 	$(CUBE)/BSP/Components/wm8994/wm8994.c \
+	$(USBHOST)/Core/Src/usbd_core.c \
 	$(WRLIB)/wrLpGate.c \
 	$(WRLIB)/wrFuncGen.c \
 	$(WRLIB)/wrMath.c \
