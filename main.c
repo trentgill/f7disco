@@ -38,6 +38,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "main.h"
   
@@ -148,7 +149,7 @@ int main(void)
 	return 0;
 }
 
-uint16_t inker = 0;
+uint32_t inker = 0;
 void oncePerSecond(void)
 {
 	static uint8_t flip;
@@ -158,9 +159,9 @@ void oncePerSecond(void)
 	// HAL_Delay(100);
 	if(!flip){
 		// READ
-		itoa(inker, strung, 10);
-		strcat(strung, " + 1\0");
-		Disco_Term_Read_String(strung);
+		sprintf(strung, "%d", inker); // convert inker to string
+	    strcat(strung, " + 1\0");
+	    Disco_Term_Read_String(strung);
 	} else {
 		// EVAL
 		strcpy( strung, Disco_Term_Eval() );

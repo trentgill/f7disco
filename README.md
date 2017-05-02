@@ -5,20 +5,20 @@ File structure is arranged as follows:
 
 (home)
 	|---stm32f7
-	|		|---f7disco 	<--- This repo
-	|		|---STM32Cube	<--- github/trentgill
+	|		|---f7disco 	  <--- This repo
+	|		|---STM32_Cube_F7 <--- github/trentgill
 	|		|---other_proj
 	|		|---...
-	|		|---lua-5.3.4   <--- github/trentgill
+	|		|---lua           <--- github/trentgill
 	|
 	|---stm32f4
 	|		|---...
 	|
-	|---wrLib 				<--- github/whimsicalraps
+	|---wrLib 				  <--- github/whimsicalraps
 
-/STM32Cube 	git pull https://github.com/trentgill/STM32_Cube_F7.git
-/lua-5.3.4 	git pull https://github.com/trentgill/lua.git
-/wrLib 		git pull https://github.com/whimsicalraps/wrLib.git
+/STM32Cube  git pull https://github.com/trentgill/STM32_Cube_F7.git
+/lua        git pull https://github.com/trentgill/lua.git
+/wrLib      git pull https://github.com/whimsicalraps/wrLib.git
 
 # Roadmap
 
