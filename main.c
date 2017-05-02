@@ -153,9 +153,7 @@ void oncePerSecond(void)
   // HAL_Delay(100);
 	if(!flip){
 		// READ
-
-
-		sprintf(strung, "%d", inker);
+		sprintf(strung, "%d", inker); // convert inker to string
     strcat(strung, " + 1\0");
     Disco_Term_Read_String(strung);
 	} else {
