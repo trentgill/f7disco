@@ -2,10 +2,10 @@
 #include "disco_term.h"
 #include "debug_usart.h"
 
-#include <lua.h>
+/*#include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-
+*/
 extern DSI_HandleTypeDef hdsi_discovery;
 
 typedef struct term {
@@ -117,7 +117,7 @@ unsigned char* Disco_Term_Eval(void)
 	char* firstchar = &(dterm.prompt[2]);
 	strcat(lstring, firstchar);
 
-	lua_State *luaTerm = luaL_newstate();
+/*	lua_State *luaTerm = luaL_newstate();
 	luaL_openlibs(luaTerm);
 	
 	// **EVAL**
@@ -130,7 +130,7 @@ unsigned char* Disco_Term_Eval(void)
 	}
 
 	lua_close(luaTerm);
-
+*/
 	// redraw history, clear prompt & redraw screen
 	Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
 	Disco_Term_Read_Clear();

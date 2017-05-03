@@ -29,6 +29,7 @@ STM32_INCLUDES = \
 	-I$(CUBE)/BSP/Components/ \
 	-I$(CUBE)/BSP/STM32F769I-Discovery/ \
 	-I$(CUBE)/STM32F7xx_HAL_Driver/Inc/ \
+	-Iusb/ \
 	-I$(USBHOST)/Class/HID/Inc/ \
 	-I$(USBHOST)/Core/Inc/ \
 	-I/usr/local/include/
@@ -69,18 +70,28 @@ SRC = main.c \
 	$(HALS)/stm32f7xx_hal_usart.c \
 	$(HALS)/stm32f7xx_hal_hcd.c \
 	$(HALS)/stm32f7xx_ll_fmc.c \
+	$(HALS)/stm32f7xx_ll_usb.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_audio.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c \
 	$(CUBE)/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c \
 	$(CUBE)/BSP/Components/otm8009a/otm8009a.c \
 	$(CUBE)/BSP/Components/wm8994/wm8994.c \
-	$(USBHOST)/Core/Src/usbd_core.c \
+	$(USBHOST)/Core/Src/usbh_core.c \
+	$(USBHOST)/Core/Src/usbh_pipes.c \
+	$(USBHOST)/Core/Src/usbh_ctlreq.c \
+	$(USBHOST)/Core/Src/usbh_ioreq.c \
+	$(USBHOST)/Class/HID/Src/usbh_hid.c \
+	$(USBHOST)/Class/HID/Src/usbh_hid_keybd.c \
+	$(USBHOST)/Class/HID/Src/usbh_hid_mouse.c \
+	$(USBHOST)/Class/HID/Src/usbh_hid_parser.c \
 	$(WRLIB)/wrLpGate.c \
 	$(WRLIB)/wrFuncGen.c \
 	$(WRLIB)/wrMath.c \
+	$(wildcard usb/*.c) \
 	$(wildcard lib/*.c)
 
+	# $(USBHOST)/Core/Src/usbd_core.c \
 
 LUACORE_OBJS=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \

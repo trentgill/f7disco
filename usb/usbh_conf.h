@@ -106,6 +106,7 @@
 #define USBH_DbgLog(...)                         
 #endif
 
+
 /* Exported functions ------------------------------------------------------- */
 
 #endif /* __USBH_CONF_H */

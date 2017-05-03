@@ -42,16 +42,20 @@
 
 #include "main.h"
   
-#include <lua.h>
+/*#include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-
+*/
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
 #include "lib/disco_term.h"
 #include "lib/disco_codec.h"
 
+#include <stm32f769i_discovery.h>
+#include "usb/usbh_conf.h"
 #include "usb/usb_keyboard.h"
+#include <usbh_core.h>
+ 
 
 extern uint32_t uwTick;  // time since reboot (ms)
 
@@ -60,6 +64,8 @@ extern uint32_t uwTick;  // time since reboot (ms)
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 extern USBH_HandleTypeDef hUSBHost;
+extern HID_ApplicationTypeDef Appli_state;
+
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
@@ -69,14 +75,16 @@ static void CPU_CACHE_Enable(void);
 void oncePerSecond(void);
 
 static void HID_InitApplication(void);
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 
 
 /* Private functions ---------------------------------------------------------*/
+// uint8_t  BSP_IO_Init(void);
 
 /**
   * @brief  Main program
   * @param  None
-  * @retval None
+  * @retval None 
   */
 __IO float master_pitch;
 __IO float master_mod;
@@ -99,16 +107,18 @@ int main(void)
 	Disco_HW_Init();
 	Disco_Codec_Init();
 
+	HAL_Delay(100);
+	// Debug_USART_printf("time to party!\n\r");
+
 	// USB stack
-	BSP_IO_Init(); // Init IO Expander
-	HID_MenuInit(); // Init Menu?!
-	USBH_Init(&hUSBHost, USBH_UserProcess, 0); // Init Host Lib
+	HID_MenuInit();
+	USBH_Init(&hUSBHost, USBH_UserProcess, HOST_USER_CLASS_ACTIVE); // Init Host Lib
 	USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
 	USBH_Start(&hUSBHost);
 
+// Debug_USART_printf("guh\n\r");
+
 	// APPLICATION CODE
-	HAL_Delay(100);
-	Debug_USART_printf("time to party!\n\r");
 
 	oncePerSecond(); // call without waiting
 
@@ -118,6 +128,7 @@ int main(void)
 	static uint8_t p_count, m_count;
 	char state[4] = { '0', ' ', '0', '\0' };
 
+static uint8_t usb_set = 0;
 	while(1){
 		// Disco_Codec_Loop(); // process audio loop
 		if( (uwTick - lastEventTime) > 1000 ){
@@ -132,6 +143,12 @@ int main(void)
 		USBH_Process(&hUSBHost); // USB Host BG task
 		HID_MenuProcess(); // HID Menu Process
 
+		if(usb_set == 0){
+			if( BSP_PB_GetState(0) ){
+				usb_set = 1;
+				HID_MenuGo();
+			}
+		}
 		// hacked synthesis settings change
 		/*uint8_t press = BSP_PB_GetState(0);
 		if( (lastButton != press) && (press == 1) ){
@@ -172,6 +189,31 @@ void oncePerSecond(void)
 		Debug_USART_printf( strung );
 	}
 	flip ^= 1;
+}
+
+
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)
+{
+  switch(id)
+  { 
+  case HOST_USER_SELECT_CONFIGURATION:
+    break;
+    
+  case HOST_USER_DISCONNECTION:
+    Appli_state = APPLICATION_DISCONNECT;
+    break;
+    
+  case HOST_USER_CLASS_ACTIVE:
+    Appli_state = APPLICATION_READY;
+    break;
+    
+  case HOST_USER_CONNECTION:
+    Appli_state = APPLICATION_START;
+    break;
+    
+  default:
+    break; 
+  }
 }
 
 
