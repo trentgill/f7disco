@@ -42,10 +42,10 @@
 
 #include "main.h"
   
-/*#include <lua.h>
+#include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-*/
+
 #include "lib/debug_usart.h"
 #include "lib/disco_hw.h"
 #include "lib/disco_term.h"
@@ -63,19 +63,12 @@ extern uint32_t uwTick;  // time since reboot (ms)
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern USBH_HandleTypeDef hUSBHost;
-extern HID_ApplicationTypeDef Appli_state;
-
-
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 void oncePerSecond(void);
-
-static void HID_InitApplication(void);
-static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 
 
 /* Private functions ---------------------------------------------------------*/
@@ -108,18 +101,13 @@ int main(void)
 	Disco_Codec_Init();
 
 	HAL_Delay(100);
-	// Debug_USART_printf("time to party!\n\r");
+	Debug_USART_printf("time to party!\n\r");
+	HAL_Delay(100);
 
 	// USB stack
-	HID_MenuInit();
-	USBH_Init(&hUSBHost, USBH_UserProcess, HOST_USER_CLASS_ACTIVE); // Init Host Lib
-	USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
-	USBH_Start(&hUSBHost);
+	USB_HID_Init();
 
-// Debug_USART_printf("guh\n\r");
-
-	// APPLICATION CODE
-
+	// APPLICATION code
 	oncePerSecond(); // call without waiting
 
 	// Infinite loop
@@ -140,14 +128,11 @@ static uint8_t usb_set = 0;
 			lastEventTime = uwTick;
 		}
 
-		USBH_Process(&hUSBHost); // USB Host BG task
-		HID_MenuProcess(); // HID Menu Process
+		USB_HID_Loop(); // run main USB loop
 
 		if(usb_set == 0){
-			if( BSP_PB_GetState(0) ){
-				usb_set = 1;
-				HID_MenuGo();
-			}
+			usb_set = 1;
+			HID_MenuGo();
 		}
 		// hacked synthesis settings change
 		/*uint8_t press = BSP_PB_GetState(0);
@@ -189,31 +174,6 @@ void oncePerSecond(void)
 		Debug_USART_printf( strung );
 	}
 	flip ^= 1;
-}
-
-
-static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)
-{
-  switch(id)
-  { 
-  case HOST_USER_SELECT_CONFIGURATION:
-    break;
-    
-  case HOST_USER_DISCONNECTION:
-    Appli_state = APPLICATION_DISCONNECT;
-    break;
-    
-  case HOST_USER_CLASS_ACTIVE:
-    Appli_state = APPLICATION_READY;
-    break;
-    
-  case HOST_USER_CONNECTION:
-    Appli_state = APPLICATION_START;
-    break;
-    
-  default:
-    break; 
-  }
 }
 
 

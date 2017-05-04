@@ -18,7 +18,7 @@ HCD_HandleTypeDef hhcd;
 HID_KEYBD_Info_TypeDef *kbInfo;
 
 
-uint8_t               prev_select = 0;
+uint8_t	prev_select = 0;
 
 uint8_t *DEMO_KEYBOARD_menu[] = {
 	(uint8_t *)"      1 - Start Keyboard / Clear                                            ",
@@ -40,22 +40,25 @@ void HID_MenuGo(void)
 {
 	// CHEAT
 	hid_demo.select = 0x80;
+	Appli_state = APPLICATION_READY;
 	HID_MenuProcess();
 }
 
 void HID_MenuInit(void)
 {
+	// called once at init
 	hid_demo.state = HID_DEMO_IDLE;
 
 	// Debug_USART_printf("menuinit\n\r");
 	HID_MenuProcess();
-	/*kbInfo = USBH_HID_GetKeybdInfo(&hUSBHost);
+	kbInfo = USBH_HID_GetKeybdInfo(&hUSBHost);
 	if( kbInfo != NULL ){
+		Debug_USART_printf("huh?\n\r");
 		char c = USBH_HID_GetASCIICode(kbInfo);
 		if( c != 0 ){
 			// send to REPL if not a NULL char
 		}
-	}*/
+	}
 }
 
 void HID_MenuProcess(void)
@@ -66,7 +69,7 @@ void HID_MenuProcess(void)
 		// HID_SelectItem(DEMO_HID_menu, 0); 
 		hid_demo.state = HID_DEMO_WAIT;
 		hid_demo.select = 0;
-		Debug_USART_printf("wait\n\r");
+		// Debug_USART_printf("wait\n\r");
 		break;        
 
 	case HID_DEMO_WAIT:
@@ -101,8 +104,6 @@ void HID_MenuProcess(void)
 		break; 
 
 	case HID_DEMO_START:
-// CHEAT
-Appli_state = APPLICATION_READY;
 		if(Appli_state == APPLICATION_READY)
 		{
 			// Debug_USART_putn( USBH_HID_GetDeviceType(&hUSBHost) );
@@ -146,7 +147,7 @@ Appli_state = APPLICATION_READY;
 	case HID_DEMO_KEYBOARD:
 		if(Appli_state == APPLICATION_READY)  
 		{
-			Debug_USART_printf("key process\n\r");
+			// Debug_USART_printf("key process\n\r");
 			HID_KeyboardMenuProcess();
 			USBH_KeybdDemo(&hUSBHost);
 		}   
@@ -169,75 +170,81 @@ Appli_state = APPLICATION_READY;
 
 void HID_KeyboardMenuProcess(void)
 {
-	Debug_USART_printf("menuprocess\n\r");
-  switch(hid_demo.keyboard_state)
-  {
-  case HID_KEYBOARD_IDLE:
-    hid_demo.keyboard_state = HID_KEYBOARD_START;
-    // HID_SelectItem(DEMO_KEYBOARD_menu, 0);   
-    hid_demo.select = 0;
-    prev_select = 0;       
-    break;
-    
-  case HID_KEYBOARD_WAIT:
-    if(hid_demo.select != prev_select)
-    {
-      prev_select = hid_demo.select ;
-      // HID_SelectItem(DEMO_KEYBOARD_menu, hid_demo.select & 0x7F);
-      /* Handle select item */
-      if(hid_demo.select & 0x80)
-      {
-        hid_demo.select &= 0x7F;
-        switch(hid_demo.select)
-        {
-        case 0: 
-          hid_demo.keyboard_state = HID_KEYBOARD_START;
-          break;
-          
-        case 1: /* Return */
-          // LCD_LOG_ClearTextZone();
-          hid_demo.state = HID_DEMO_REENUMERATE;
-          hid_demo.select = 0;
-          break;
-          
-        default:
-          break;
-        }
-      }
-    }
-    break; 
-    
-  case HID_KEYBOARD_START:
-    // USR_KEYBRD_Init();   
-    hid_demo.keyboard_state = HID_KEYBOARD_WAIT;
-    break;  
-    
-  default:
-    break;
-  }
+	// Debug_USART_printf("menuprocess\n\r");
+	switch(hid_demo.keyboard_state)
+	{
+	case HID_KEYBOARD_IDLE:
+		hid_demo.keyboard_state = HID_KEYBOARD_START;
+		// HID_SelectItem(DEMO_KEYBOARD_menu, 0);   
+		hid_demo.select = 0;
+		prev_select = 0;
+		break;
+
+	case HID_KEYBOARD_WAIT:
+			// Debug_USART_printf("key wait #1\n\r");
+		
+
+		// this is re-select?!
+		if(hid_demo.select != prev_select){
+			prev_select = hid_demo.select ;
+			// HID_SelectItem(DEMO_KEYBOARD_menu, hid_demo.select & 0x7F);
+			/* Handle select item */
+			if(hid_demo.select & 0x80){
+				hid_demo.select &= 0x7F;
+				switch(hid_demo.select){
+
+				case 0: 
+					hid_demo.keyboard_state = HID_KEYBOARD_START;
+					break;
+
+				case 1: /* Return */
+					// LCD_LOG_ClearTextZone();
+					hid_demo.state = HID_DEMO_REENUMERATE;
+					hid_demo.select = 0;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+		break; 
+
+	case HID_KEYBOARD_START:
+		USBH_HID_KeybdInit(&hUSBHost);
+		// USR_KEYBRD_Init();
+
+		hid_demo.keyboard_state = HID_KEYBOARD_WAIT;
+		break;  
+
+	default:
+		break;
+	}
 }
 
+void USR_KEYBRD_Init(void)
+{
+	Debug_USART_printf("draw the > in terminal\n\r");
+}
 
 static void USBH_KeybdDemo(USBH_HandleTypeDef *phost)
 {
-	Debug_USART_printf("USBH_KeybdDemo\n\r");
-  HID_KEYBD_Info_TypeDef *k_pinfo; 
-  char c;
-  k_pinfo = USBH_HID_GetKeybdInfo(phost);
-  
-  if(k_pinfo != NULL)
-  {
-    c = USBH_HID_GetASCIICode(k_pinfo);
-    if(c != 0)
-    {
-      USR_KEYBRD_ProcessData(c);
-    }
-  }
+	HID_KEYBD_Info_TypeDef *k_pinfo; 
+	char c;
+	k_pinfo = USBH_HID_GetKeybdInfo(phost);
+	// Debug_USART_putn(k_pinfo);
+	if(k_pinfo != NULL){
+		c = USBH_HID_GetASCIICode(k_pinfo);
+
+		if(c != 0){
+			USR_KEYBRD_ProcessData(c);
+		}
+	}
 }
 
 void USR_KEYBRD_ProcessData(uint8_t data)
 {
-	Debug_USART_putn8(data);
+	Debug_USART_putc(data);
 }
 
 

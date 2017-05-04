@@ -48,9 +48,58 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
 #include "usbh_core.h"
+#include "usb_keyboard.h"
+#include "lib/debug_usart.h"
 // #include "stm32f769i_discovery.h"
 
 HCD_HandleTypeDef hhcd;
+
+extern USBH_HandleTypeDef hUSBHost;
+extern HID_ApplicationTypeDef Appli_state;// = APPLICATION_IDLE;
+// HID_DEMO_StateMachine hid_demo;
+// HCD_HandleTypeDef hhcd;
+// HID_KEYBD_Info_TypeDef *kbInfo;
+
+static void HID_InitApplication(void);
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
+
+void USB_HID_Init(void)
+{
+	HID_MenuInit();
+	USBH_Init(&hUSBHost, USBH_UserProcess, HOST_USER_CLASS_ACTIVE); // Init Host Lib
+	USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
+	USBH_Start(&hUSBHost);  
+}
+
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)
+{
+  switch(id)
+  { 
+  case HOST_USER_SELECT_CONFIGURATION:
+    break;
+    
+  case HOST_USER_DISCONNECTION:
+    Appli_state = APPLICATION_DISCONNECT;
+    break;
+    
+  case HOST_USER_CLASS_ACTIVE:
+    Appli_state = APPLICATION_READY;
+    break;
+    
+  case HOST_USER_CONNECTION:
+    Appli_state = APPLICATION_START;
+    break;
+    
+  default:
+    break; 
+  }
+}
+
+void USB_HID_Loop(void)
+{
+	USBH_Process(&hUSBHost); // USB Host BG task
+	HID_MenuProcess(); // HID Menu Process
+}
 
 /*******************************************************************************
                        HCD BSP Routines
@@ -298,6 +347,7 @@ USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef *phost)
 {
   USBH_SpeedTypeDef speed = USBH_SPEED_FULL;
   
+  // Debug_USART_putn(HAL_HCD_GetCurrentSpeed(phost->pData));
   switch (HAL_HCD_GetCurrentSpeed(phost->pData))
   {
   case 0: 
@@ -447,7 +497,7 @@ USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef *phost, uint8_t pipe
 {
   return (USBH_URBStateTypeDef)HAL_HCD_HC_GetURBState (phost->pData, pipe);
 }
-
+ 
 /**
   * @brief  Drives VBUS.
   * @param  phost: Host handle

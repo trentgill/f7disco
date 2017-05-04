@@ -81,7 +81,7 @@ void HAL_USART_MspInit(USART_HandleTypeDef *hu )
 
 void USARTx_DMA_RX_IRQHandler(void)
 {
-	BSP_LED_On(LED1);
+	// BSP_LED_On(LED1);
 	HAL_DMA_IRQHandler(handusart.hdmarx);
 }
 void USARTx_DMA_TX_IRQHandler(void)
@@ -91,7 +91,7 @@ void USARTx_DMA_TX_IRQHandler(void)
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
 {
 	// Disco_Term_Read_Debug("TxCpltCallback");
-	BSP_LED_Toggle(LED2);
+	// BSP_LED_Toggle(LED2);
 	HAL_USART_Receive_DMA( husart, USART_Rx_Buf, 5);
 }
 void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart)
@@ -110,7 +110,9 @@ void USARTx_IRQHandler(void)
 
 void Debug_USART_putc(unsigned char c)
 {
-	HAL_USART_Transmit_DMA( &handusart, &c, 1 );
+	static char str[4] = "0\n\r\0";
+	str[0] = c;
+	HAL_USART_Transmit_DMA( &handusart, str, 1 );
 }
 
 void Debug_USART_printf(char *s)
@@ -122,15 +124,16 @@ void Debug_USART_printf(char *s)
 
 void Debug_USART_putn(uint32_t n)
 {
-	char str[13] = "\n\r0xFFFFFFFF";
-	uint8_t temp;
+	// declared static as DMA just points directly to it
+	static char str[13] = "0xFFFFFFFF\n\r\0";
+	uint32_t temp;
 	for(int8_t i=7; i>=0; i--){
 		temp = n >> (i<<2);
 		temp &= 0x0000000F; // mask lowest nibble
 		if(temp<10) { // numeric
-			str[i+4] = 48+temp;
+			str[9-i] = 48+(uint8_t)temp;
 		} else { // alpha
-			str[i+4] = 55+temp;
+			str[9-i] = 55+(uint8_t)temp;
 		}
 	}
 	Debug_USART_printf(str);

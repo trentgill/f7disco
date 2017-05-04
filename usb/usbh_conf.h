@@ -56,6 +56,9 @@
 #include <string.h>
 
 /* Exported types ------------------------------------------------------------*/
+#define USE_USB_HS
+// #define USE_USB_HS_IN_FS
+
 #define USBH_MAX_NUM_ENDPOINTS                2
 #define USBH_MAX_NUM_INTERFACES               2
 #define USBH_MAX_NUM_CONFIGURATION            1
@@ -106,6 +109,8 @@
 #define USBH_DbgLog(...)                         
 #endif
 
+void USB_HID_Init(void);
+void USB_HID_Loop(void);
 
 /* Exported functions ------------------------------------------------------- */
 

@@ -43,10 +43,6 @@
 #include <stm32f7xx_hal.h>
 #include <stm32f7xx_hal_rcc.h>
 #include <stm32f7xx_hal_cortex.h>
-#include "usb/usb_keyboard.h"
-
-
-#define USE_USB_HS
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

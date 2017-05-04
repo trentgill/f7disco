@@ -47,6 +47,7 @@ typedef enum {
 }HID_ApplicationTypeDef;
 
 // Exported functions
+
 // static void HID_MenuInit(void);
 void HID_MenuInit(void);
 void HID_MenuProcess(void);

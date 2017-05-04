@@ -27,11 +27,11 @@ void Disco_HW_Loop(void)
 	uint8_t press = BSP_PB_GetState(0);
 
 	if(lastButton != press){
-		Debug_USART_printf("push");
+		// Debug_USART_printf("push");
 		// BSP_LED_Toggle(LED1);
 
 	} else {
-		BSP_LED_Off(LED1);
+		// BSP_LED_Off(LED1);
 	}
 	
 	// BSP_LED_Toggle(LED2);

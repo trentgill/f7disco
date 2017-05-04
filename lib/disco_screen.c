@@ -136,7 +136,7 @@ static void OnError_Handler(uint32_t condition)
 {
   if(condition)
   {
-    BSP_LED_On(LED1);
+    // BSP_LED_On(LED1);
     while(1) { ; } /* Blocking on error */
   }
 }
