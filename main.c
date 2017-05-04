@@ -107,23 +107,19 @@ int main(void)
 	// USB stack
 	USB_HID_Init();
 
-Debug_USART_printf("usb\n\r");
 	// APPLICATION code
-	oncePerSecond(); // call without waiting
 
 	// Infinite loop
 	static uint32_t lastEventTime = 0;
 	static uint8_t lastButton;
 	static uint8_t p_count, m_count;
 	char state[4] = { '0', ' ', '0', '\0' };
-
-static uint8_t usb_set = 0;
+	static uint8_t usb_set = 0;
 	while(1){
 		// Disco_Codec_Loop(); // process audio loop
 		if( (uwTick - lastEventTime) > 1000 ){
 			// once per second
 			lastEventTime = uwTick;
-			oncePerSecond();
 		} else if( uwTick < lastEventTime ){
 			// OVERFLOW
 			lastEventTime = uwTick;
@@ -151,32 +147,6 @@ static uint8_t usb_set = 0;
 	}
 	return 0;
 }
-
-uint32_t inker = 0;
-void oncePerSecond(void)
-{
-	static uint8_t flip;
-	unsigned char strung[51] = " \0";
-	Disco_HW_Loop();
-	
-	// HAL_Delay(100);
-/*	if(!flip){
-		// READ
-		sprintf(strung, "%d", inker); // convert inker to string
-	    strcat(strung, " + 1\0");
-	    Disco_Term_Read_String(strung);
-	} else {
-		// EVAL
-		strcpy( strung, Disco_Term_Eval() );
-		inker = atoi(strung);
-    
-		// debug
-		strcat( strung, "\n\r" );
-		Debug_USART_printf( strung );
-	}
-	flip ^= 1;
-*/}
-
 
 // LOW LEVEL SYS INIT
 /**

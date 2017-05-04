@@ -63,9 +63,6 @@ void Disco_Screen_Init(void)
 {
 	uint8_t lcd_status = LCD_OK;
 
-	// Does clock need to be set to 200Mhz for screen use??
-	// no- required due to SDRAM use!
-
   BSP_SDRAM_Init();
   
   /* Initialize the LCD   */
@@ -74,15 +71,10 @@ void Disco_Screen_Init(void)
   
   BSP_LCD_LayerDefaultInit(0, LAYER0_ADDRESS);     
   BSP_LCD_SelectLayer(0); 
-    
-  /* Display example brief   */
-  // LCD_BriefDisplay();
 
   /* Copy Buffer 0 into buffer 1, so only image area to be redrawn later */
   CopyBuffer((uint32_t *)Buffers[0], (uint32_t *)Buffers[1], 0, 0, 800, 480);
   
-  /*Draw first image */
-  // CopyBuffer((uint32_t *)Images[ImageIndex++], (uint32_t *)Buffers[front_buffer], 240, 160, 320, 240);
   pend_buffer = 0;
  
   /* Send Display On DCS Command to display */
@@ -96,36 +88,7 @@ void Disco_Screen_Init(void)
   BSP_LCD_Clear(LCD_COLOR_BLACK);
   BSP_LCD_SetBrightness(20); // 20%
   HAL_DSI_Refresh(&hdsi_discovery);
-  }
-
-void Disco_Screen_Loop(void)
-{
-	if(pend_buffer < 0) {
-      /* Prepare back buffer */     
-      /*CopyBuffer((uint32_t *)Images[ImageIndex++],
-                  (uint32_t *)Buffers[1- front_buffer],
-                  240, 160, 320, 240);*/
-      pend_buffer = 1- front_buffer;
-      
-      if(ImageIndex >= 2)
-      {
-        ImageIndex = 0;
-      }
-
-      /* Refresh the display */
-      HAL_DSI_Refresh(&hdsi_discovery);
-      
-      /* Wait some time before switching to next stage */
-      HAL_Delay(500); 
-	}
 }
-
-void Disco_Terminal_Clear(void)
-{
-	pend_buffer = 
-	HAL_DSI_Refresh(&hdsi_discovery);
-}
-
 
 
 // Private function definitions

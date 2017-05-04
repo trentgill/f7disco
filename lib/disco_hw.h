@@ -5,6 +5,5 @@
 
 // Public declarations
 void Disco_HW_Init(void);
-void Disco_HW_Loop(void);
 
 #endif

@@ -5,7 +5,6 @@
 #include <stm32f769i_discovery_sdram.h>
 
 void Disco_Screen_Init(void);
-void Disco_Screen_Loop(void);
 
 // IRQ 'STRONG' definition
 void DSI_IRQHandler(void);
