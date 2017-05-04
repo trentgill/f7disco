@@ -226,7 +226,17 @@ static void USBH_KeybdDemo(USBH_HandleTypeDef *phost)
 		c = USBH_HID_GetASCIICode(k_pinfo);
 
 		if(c != 0){
+			// text input
 			USR_KEYBRD_ProcessData(c);
+		} else {
+			// modifiers & arrow keys
+			/*if(&k_pinfo->lshift){
+				// Left Shift
+			}*/
+			
+			// NB: keys is an array with size=6
+				// if more than 1 held, need to check buf
+			Disco_Term_Set_Cursor( k_pinfo->keys[0] );
 		}
 	}
 }

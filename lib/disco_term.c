@@ -12,6 +12,7 @@ typedef struct term {
 	unsigned char 	line[TERM_MAX_LINES][TERM_CHARS_P_L];
 	unsigned char 	prompt[TERM_CHARS_P_L]; // << sloppy
 	uint8_t 		ix_eval;
+	uint8_t 		cursor;
 	// uint8_t			ix_len;
 } term_t;
 
@@ -40,6 +41,7 @@ void Disco_Term_Splash(void)
 	
 	// Initialize prompt & clear history
 	strcpy( dterm.prompt, "> \0\0" );
+	dterm.cursor = 2; // first char after "> "
 	Disco_Term_Redraw_History((int8_t)dterm.ix_eval);
 	Disco_Term_Draw_Prompt();
 }
@@ -62,13 +64,36 @@ void Disco_Term_Draw_Prompt( void )
 	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);  // blue on white
 	
 	// draw cursor to screen
-	uint16_t cursor = 2;
-	char cc = dterm.prompt[cursor];
+	char cc = dterm.prompt[dterm.cursor];
 	if(cc == 0){ cc = ' '; }
-	BSP_LCD_DisplayChar( cursor * BSP_LCD_GetCharWidth(), LINE(19), cc );
+	BSP_LCD_DisplayChar( dterm.cursor * BSP_LCD_GetCharWidth(), LINE(19), cc );
 
 	// redraw screen
 	HAL_DSI_Refresh(&hdsi_discovery);
+}
+
+void Disco_Term_Set_Cursor( uint8_t keycode )
+{
+	switch (keycode) {
+	case 0x50:
+		// LEFT
+		dterm.cursor--;
+		Debug_USART_printf("l\n\r");
+		break;
+	case 0x4F:
+		// RIGHT
+		dterm.cursor++; 
+		Debug_USART_printf("r\n\r");
+		break;
+	case 0x52:
+		// UP
+		Debug_USART_printf("u\n\r");
+		break;
+	case 0x51:
+		// DOWN
+		Debug_USART_printf("d\n\r");
+		break;
+	}
 }
 
 // Public Definitions 
@@ -76,20 +101,17 @@ void Disco_Term_Read_String(unsigned char* s)
 {
 	strcpy( dterm.prompt, "> \0" ); // rm this line
 	strcat( dterm.prompt, s );
+	dterm.cursor = strlen(dterm.prompt); // move cursor to end of string
 
 	Disco_Term_Draw_Prompt();
 }
 
 void Disco_Term_Read_Char(unsigned char c)
 {
-	// leave space for >, " ", <new char>, and \0
-	// strncat( dterm.prompt, c, 1 ); // append single char
-	/*if( strlen(dterm.prompt) < TERM_CHARS_P_L-4 ){
-	} else { ;; } // data entry error
-*/
 	static char buf[2] = {32,0};
 	buf[0] = c;
 	strcat( dterm.prompt, buf );
+	dterm.cursor++;
 	Disco_Term_Draw_Prompt();
 }
 
@@ -99,7 +121,16 @@ void Disco_Term_Read_Backspace(void)
 	size_t tlen = strlen(dterm.prompt);
 	// >3 for "> " (2 chars) plus \0
 	// -1 for 0reference, -2 to reach last real char
-	if( tlen > 3 ){ dterm.prompt[tlen-2] = '\0'; }
+	if( tlen > 3 ){
+		dterm.prompt[tlen-1] = '\0';
+		dterm.cursor--;
+	}
+
+	// can move cursor into string (not just edit from end)
+	/*if( dterm.cursor > 2){
+		dterm.p
+		dterm.cursor--;
+	}*/
 
 	Disco_Term_Draw_Prompt();
 }

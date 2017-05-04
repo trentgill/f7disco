@@ -16,6 +16,8 @@ void Disco_Term_Read_Backspace(void);
 void Disco_Term_Read_Clear(void);
 void Disco_Term_Read_Debug(unsigned char* s);
 
+void Disco_Term_Set_Cursor( uint8_t keycode );
+
 unsigned char* Disco_Term_Eval(void);
 
 #endif
