@@ -233,23 +233,22 @@ static void USBH_KeybdDemo(USBH_HandleTypeDef *phost)
 
 void USR_KEYBRD_ProcessData(uint8_t data)
 {
-	if(data == 0x0D){
-		// this is CR, but might need line feed (0x0A)
+	Debug_USART_putn(data);
+	if(data == 0x0A){ // Enter
 		// EVAL!
 		Disco_Term_Eval();
-	} else if(data == 0x08){
+	} else if(data == 0x0D){ // Backspace
 		Disco_Term_Read_Backspace();
-	} else if(data >= 0x20){
+	} else if(data >= 0x20){ // Normal keys
 		if(data < 0x7F){
 			// char
 			Disco_Term_Read_Char(data);
-		} else {
-			// delete (need to add fn!)
+		} else { // Delete
+			// currently wrong
 			Disco_Term_Read_Backspace();
 		}
 	}
 
-	Debug_USART_putc(data);
 
 }
 

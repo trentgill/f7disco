@@ -35,7 +35,7 @@ void Disco_Term_Splash(void)
 	for(uint8_t i=0; i<TERM_MAX_LINES; i++){
 		strcpy( dterm.line[i], " \0\0" );
 	}
-	
+
 	HAL_DSI_Refresh(&hdsi_discovery);
 }
 
@@ -75,7 +75,9 @@ void Disco_Term_Read_Backspace(void)
 {
 	 // set last non-null char to null
 	size_t tlen = strlen(dterm.prompt);
-	if( tlen > 2 ){ dterm.prompt[tlen-1] = '\0'; }
+	// >3 for "> " (2 chars) plus \0
+	// -1 for 0reference, -2 to reach last real char
+	if( tlen > 3 ){ dterm.prompt[tlen-2] = '\0'; }
 
 	Disco_Term_Draw_Prompt();
 }
