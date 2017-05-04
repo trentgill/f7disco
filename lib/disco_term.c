@@ -19,6 +19,9 @@ typedef struct term {
 // private declarations
 void Disco_Term_Redraw_History(int8_t row);
 void Disco_Term_Draw_Prompt(void);
+void Disco_Term_MoveCursorLeft( void );
+void Disco_Term_MoveCursorRight( void );
+
 
 // private vars
 term_t 	dterm;
@@ -72,22 +75,29 @@ void Disco_Term_Draw_Prompt( void )
 	HAL_DSI_Refresh(&hdsi_discovery);
 }
 
+void Disco_Term_MoveCursorLeft( void )
+{
+	dterm.cursor--;
+	if(dterm.cursor < 2){ dterm.cursor = 2; }
+}
+void Disco_Term_MoveCursorRight( void )
+{
+	dterm.cursor++;
+	uint8_t len = strlen(dterm.prompt);
+	if(dterm.cursor > len){ dterm.cursor = len; }
+}
+
 void Disco_Term_Set_Cursor( uint8_t keycode )
 {
 	switch (keycode) {
 	case 0x50:
 		// LEFT
-		dterm.cursor--;
-		if(dterm.cursor < 2){ dterm.cursor = 2; } // limit
+		Disco_Term_MoveCursorLeft();
 		Disco_Term_Draw_Prompt();
 		break;
 	case 0x4F:
 		// RIGHT
-		dterm.cursor++;
-		uint8_t len = strlen(dterm.prompt);
-		if(dterm.cursor > len){
-			dterm.cursor = len;
-		}
+		Disco_Term_MoveCursorRight();
 		Disco_Term_Draw_Prompt();
 		break;
 	case 0x52:
@@ -115,8 +125,11 @@ void Disco_Term_Read_Char(unsigned char c)
 {
 	static char buf[2] = {32,0};
 	buf[0] = c;
+
+	// ONLY JOINS ON END: update to insert at cursor
 	strcat( dterm.prompt, buf );
-	dterm.cursor++;
+
+	Disco_Term_MoveCursorRight();
 	Disco_Term_Draw_Prompt();
 }
 
@@ -126,9 +139,9 @@ void Disco_Term_Read_Backspace(void)
 	size_t tlen = strlen(dterm.prompt);
 	// >3 for "> " (2 chars) plus \0
 	// -1 for 0reference, -2 to reach last real char
-	if( tlen > 3 ){
+	if( tlen > 2 ){
 		dterm.prompt[tlen-1] = '\0';
-		dterm.cursor--;
+		Disco_Term_MoveCursorLeft();
 	}
 
 	// can move cursor into string (not just edit from end)
@@ -143,6 +156,7 @@ void Disco_Term_Read_Backspace(void)
 void Disco_Term_Read_Clear(void)
 {
 	strcpy( dterm.prompt, "> \0" );
+	dterm.cursor = 2;
 	Disco_Term_Draw_Prompt();
 }
 
