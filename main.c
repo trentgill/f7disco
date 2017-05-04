@@ -107,6 +107,7 @@ int main(void)
 	// USB stack
 	USB_HID_Init();
 
+Debug_USART_printf("usb\n\r");
 	// APPLICATION code
 	oncePerSecond(); // call without waiting
 
@@ -159,7 +160,7 @@ void oncePerSecond(void)
 	Disco_HW_Loop();
 	
 	// HAL_Delay(100);
-	if(!flip){
+/*	if(!flip){
 		// READ
 		sprintf(strung, "%d", inker); // convert inker to string
 	    strcat(strung, " + 1\0");
@@ -174,7 +175,7 @@ void oncePerSecond(void)
 		Debug_USART_printf( strung );
 	}
 	flip ^= 1;
-}
+*/}
 
 
 // LOW LEVEL SYS INIT

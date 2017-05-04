@@ -2,6 +2,7 @@
 #include "main.h"
 
 #include "../lib/debug_usart.h"
+#include "../lib/disco_term.h"
 
 // private declarations
 void HID_KeyboardMenuProcess(void);
@@ -48,17 +49,7 @@ void HID_MenuInit(void)
 {
 	// called once at init
 	hid_demo.state = HID_DEMO_IDLE;
-
-	// Debug_USART_printf("menuinit\n\r");
 	HID_MenuProcess();
-	kbInfo = USBH_HID_GetKeybdInfo(&hUSBHost);
-	if( kbInfo != NULL ){
-		Debug_USART_printf("huh?\n\r");
-		char c = USBH_HID_GetASCIICode(kbInfo);
-		if( c != 0 ){
-			// send to REPL if not a NULL char
-		}
-	}
 }
 
 void HID_MenuProcess(void)
@@ -69,7 +60,7 @@ void HID_MenuProcess(void)
 		// HID_SelectItem(DEMO_HID_menu, 0); 
 		hid_demo.state = HID_DEMO_WAIT;
 		hid_demo.select = 0;
-		// Debug_USART_printf("wait\n\r");
+		Debug_USART_printf("wait\n\r");
 		break;        
 
 	case HID_DEMO_WAIT:
@@ -86,7 +77,7 @@ void HID_MenuProcess(void)
 				switch(hid_demo.select)
 				{
 				case 0:
-					// Debug_USART_printf("demo_start\n\r");
+					Debug_USART_printf("demo_start\n\r");
 					hid_demo.state = HID_DEMO_START;
 					break;
 
@@ -99,7 +90,7 @@ void HID_MenuProcess(void)
 					break;
 				}
 			}
-			// Debug_USART_printf("no sel\n\r");
+			Debug_USART_printf("no sel\n\r");
 		}
 		break; 
 
@@ -147,7 +138,7 @@ void HID_MenuProcess(void)
 	case HID_DEMO_KEYBOARD:
 		if(Appli_state == APPLICATION_READY)  
 		{
-			// Debug_USART_printf("key process\n\r");
+			// Called repetitively on a timer
 			HID_KeyboardMenuProcess();
 			USBH_KeybdDemo(&hUSBHost);
 		}   
@@ -159,9 +150,7 @@ void HID_MenuProcess(void)
 
 	if(Appli_state == APPLICATION_DISCONNECT)
 	{
-		Appli_state = APPLICATION_IDLE; 
-		// LCD_LOG_ClearTextZone();
-		// LCD_ErrLog("HID device disconnected!\n");
+		Appli_state = APPLICATION_IDLE;
 		hid_demo.state = HID_DEMO_IDLE;
 		hid_demo.select = 0;    
 	}
@@ -244,7 +233,24 @@ static void USBH_KeybdDemo(USBH_HandleTypeDef *phost)
 
 void USR_KEYBRD_ProcessData(uint8_t data)
 {
+	if(data == 0x0D){
+		// this is CR, but might need line feed (0x0A)
+		// EVAL!
+		Disco_Term_Eval();
+	} else if(data == 0x08){
+		Disco_Term_Read_Backspace();
+	} else if(data >= 0x20){
+		if(data < 0x7F){
+			// char
+			Disco_Term_Read_Char(data);
+		} else {
+			// delete (need to add fn!)
+			Disco_Term_Read_Backspace();
+		}
+	}
+
 	Debug_USART_putc(data);
+
 }
 
 

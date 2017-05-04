@@ -66,9 +66,17 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 void USB_HID_Init(void)
 {
 	HID_MenuInit();
+HAL_Delay(50);
+Debug_USART_printf("menuinit\n\r");
 	USBH_Init(&hUSBHost, USBH_UserProcess, HOST_USER_CLASS_ACTIVE); // Init Host Lib
+HAL_Delay(50);
+Debug_USART_printf("usbinit\n\r");
 	USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
+HAL_Delay(50);
+Debug_USART_printf("class\n\r");
 	USBH_Start(&hUSBHost);  
+HAL_Delay(50);
+Debug_USART_printf("Start\n\r");
 }
 
 static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)

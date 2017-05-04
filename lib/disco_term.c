@@ -2,10 +2,10 @@
 #include "disco_term.h"
 #include "debug_usart.h"
 
-/*#include <lua.h>
+#include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-*/
+
 extern DSI_HandleTypeDef hdsi_discovery;
 
 typedef struct term {
@@ -25,7 +25,6 @@ void Disco_Term_Splash(void)
 	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
 	BSP_LCD_FillRect(0, 72, 800, 408);
 
-	HAL_DSI_Refresh(&hdsi_discovery);
 
 	BSP_LCD_SetFont(&Font24);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
@@ -36,6 +35,8 @@ void Disco_Term_Splash(void)
 	for(uint8_t i=0; i<TERM_MAX_LINES; i++){
 		strcpy( dterm.line[i], " \0\0" );
 	}
+	
+	HAL_DSI_Refresh(&hdsi_discovery);
 }
 
 // REPL
@@ -57,13 +58,16 @@ void Disco_Term_Read_String(unsigned char* s)
 	Disco_Term_Draw_Prompt();
 }
 
-void Disco_Term_Read_Char(unsigned char* c)
+void Disco_Term_Read_Char(unsigned char c)
 {
 	// leave space for >, " ", <new char>, and \0
 	// strncat( dterm.prompt, c, 1 ); // append single char
 	/*if( strlen(dterm.prompt) < TERM_CHARS_P_L-4 ){
 	} else { ;; } // data entry error
 */
+	static char buf[2] = {32,0};
+	buf[0] = c;
+	strcat( dterm.prompt, buf );
 	Disco_Term_Draw_Prompt();
 }
 
@@ -117,7 +121,7 @@ unsigned char* Disco_Term_Eval(void)
 	char* firstchar = &(dterm.prompt[2]);
 	strcat(lstring, firstchar);
 
-/*	lua_State *luaTerm = luaL_newstate();
+	lua_State *luaTerm = luaL_newstate();
 	luaL_openlibs(luaTerm);
 	
 	// **EVAL**
@@ -130,7 +134,7 @@ unsigned char* Disco_Term_Eval(void)
 	}
 
 	lua_close(luaTerm);
-*/
+
 	// redraw history, clear prompt & redraw screen
 	Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
 	Disco_Term_Read_Clear();
