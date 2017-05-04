@@ -16,8 +16,6 @@ void Disco_HW_Init(void)
 
 	// Screen
 	Disco_Screen_Init();
-	Disco_Term_Splash();
-
 }
 
 void Disco_HW_Loop(void)

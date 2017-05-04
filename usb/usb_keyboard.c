@@ -8,6 +8,7 @@
 void HID_KeyboardMenuProcess(void);
 static void USBH_KeybdDemo(USBH_HandleTypeDef *phost);
 void USR_KEYBRD_ProcessData(uint8_t data);
+void USR_KEYBRD_Init(void);
 
 // private data
 USBH_HandleTypeDef hUSBHost;
@@ -201,7 +202,7 @@ void HID_KeyboardMenuProcess(void)
 
 	case HID_KEYBOARD_START:
 		USBH_HID_KeybdInit(&hUSBHost);
-		// USR_KEYBRD_Init();
+		USR_KEYBRD_Init();
 
 		hid_demo.keyboard_state = HID_KEYBOARD_WAIT;
 		break;  
@@ -213,7 +214,8 @@ void HID_KeyboardMenuProcess(void)
 
 void USR_KEYBRD_Init(void)
 {
-	Debug_USART_printf("draw the > in terminal\n\r");
+	// Init the screen (ready for input!)
+	Disco_Term_Splash();
 }
 
 static void USBH_KeybdDemo(USBH_HandleTypeDef *phost)

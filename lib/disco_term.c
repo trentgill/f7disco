@@ -38,9 +38,6 @@ void Disco_Term_Splash(void)
 	BSP_LCD_SetFont(&Font24);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // white on blue
-
-	// set to 20% (stops HF noise / lowers power)
-	BSP_LCD_SetBrightness(20);
 	
 	// Initialize prompt & clear history
 	strcpy( dterm.prompt, "> \0\0" );
@@ -123,15 +120,8 @@ void Disco_Term_Read_String(unsigned char* s)
 
 void Disco_Term_Read_Char(unsigned char c)
 {
-	static char buf[2] = {32,0};
-	buf[0] = c;
-
-	// ONLY JOINS ON END: update to insert at cursor
-	// strcat( dterm.prompt, buf );
-
 	uint16_t cur_len = strlen(dterm.prompt);
 	if(cur_len < TERM_CHARS_P_L){
-		// insert
 		uint16_t cp_len = cur_len - dterm.cursor + 1; // chars after cursor
 		
 		char* src = &dterm.prompt[cur_len]; // index of the null char
@@ -190,6 +180,9 @@ void Disco_Term_Read_Debug(unsigned char* s)
 
 void Disco_Term_Redraw_History(int8_t row)
 {
+	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+
 	for( uint8_t i=0; i<(TERM_MAX_LINES-2); i++ ){
 		uint8_t line = 17 - (i*2); // count up from bottom(17)
 

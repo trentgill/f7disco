@@ -92,7 +92,9 @@ void Disco_Screen_Init(void)
                      OTM8009A_CMD_DISPON,
                      0x00);
   
-  /*Refresh the LCD display*/
+  // Clear, dim & refresh the LCD screen
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+  BSP_LCD_SetBrightness(20); // 20%
   HAL_DSI_Refresh(&hdsi_discovery);
   }
 
