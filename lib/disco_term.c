@@ -78,12 +78,17 @@ void Disco_Term_Set_Cursor( uint8_t keycode )
 	case 0x50:
 		// LEFT
 		dterm.cursor--;
-		Debug_USART_printf("l\n\r");
+		if(dterm.cursor < 2){ dterm.cursor = 2; } // limit
+		Disco_Term_Draw_Prompt();
 		break;
 	case 0x4F:
 		// RIGHT
-		dterm.cursor++; 
-		Debug_USART_printf("r\n\r");
+		dterm.cursor++;
+		uint8_t len = strlen(dterm.prompt);
+		if(dterm.cursor > len){
+			dterm.cursor = len;
+		}
+		Disco_Term_Draw_Prompt();
 		break;
 	case 0x52:
 		// UP
