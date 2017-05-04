@@ -63,7 +63,9 @@ void Disco_Term_Draw_Prompt( void )
 	
 	// draw cursor to screen
 	uint16_t cursor = 2;
-	BSP_LCD_DisplayChar( cursor * BSP_LCD_GetCharWidth(), LINE(19), dterm.prompt[cursor]);
+	char cc = dterm.prompt[cursor];
+	if(cc == 0){ cc = ' '; }
+	BSP_LCD_DisplayChar( cursor * BSP_LCD_GetCharWidth(), LINE(19), cc );
 
 	// redraw screen
 	HAL_DSI_Refresh(&hdsi_discovery);
