@@ -36,6 +36,8 @@ void Disco_Term_Splash(void)
 		strcpy( dterm.line[i], " \0\0" );
 	}
 
+	// set to 50%
+	BSP_LCD_SetBrightness(20);
 	HAL_DSI_Refresh(&hdsi_discovery);
 }
 
@@ -44,8 +46,23 @@ void Disco_Term_Splash(void)
 // Private Functions
 void Disco_Term_Draw_Prompt( void )
 {
+	// base colours
+	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // blue on white
+
+	// display basic string
 	BSP_LCD_ClearStringLine(19);
 	BSP_LCD_DisplayStringAtLine(19, dterm.prompt );
+	
+	// set inverted colours for cursor
+	BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);  // blue on white
+	
+	// draw cursor to screen
+	uint16_t cursor = 2;
+	BSP_LCD_DisplayChar( cursor, LINE(19), dterm.prompt[cursor]);
+
+	// redraw screen
 	HAL_DSI_Refresh(&hdsi_discovery);
 }
 
