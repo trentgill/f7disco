@@ -28,10 +28,16 @@ static void stackDump(lua_State* L);
 
 // private vars
 term_t 	dterm;
+lua_State *luaTerm;
 
 // function definitions
 void Disco_Term_Splash(void)
 {
+	// INIT a lua state for use by the terminal
+	luaTerm = luaL_newstate();
+	luaL_openlibs(luaTerm);
+
+	// draw base state
 	BSP_LCD_SetTextColor(LCD_COLOR_GRAY);
 	BSP_LCD_FillRect(0,  0, 800,  72);
 
@@ -49,6 +55,11 @@ void Disco_Term_Splash(void)
 	Disco_Term_Draw_Prompt();
 
 	Disco_Term_Read_Debug("it's a lua terminal!");
+}
+
+void Disco_Term_Destroy(void)
+{
+	lua_close(luaTerm);
 }
 
 void Disco_Term_Timer(void)
@@ -211,8 +222,6 @@ unsigned char* Disco_Term_Eval(void)
 	char* firstchar = &(dterm.prompt[2]);
 	strcpy(lstring, firstchar);
 
-	lua_State *luaTerm = luaL_newstate();
-	luaL_openlibs(luaTerm);
 
 	lua_pushboolean(luaTerm, 1);
 	lua_pushnumber(luaTerm, 444);
@@ -265,8 +274,6 @@ unsigned char* Disco_Term_Eval(void)
 		strcpy(dterm.line[dterm.ix_eval], lstring);
 	}*/
 
-	lua_close(luaTerm);
-
 	// redraw history, clear prompt & redraw screen
 	Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
 	Disco_Term_Read_Clear();
@@ -298,7 +305,7 @@ static void stackDump(lua_State* L)
 			case LUA_TBOOLEAN:
 				Debug_USART_printf("bool: ");
 				HAL_Delay(20);
-				Debug_USART_printf(lua_toboolean(L, i) ? "true\n\r" : "false\n\r");
+				Debug_USART_printf(lua_toboolean(L, i) ? "true" : "false");
 				break;
 			case LUA_TNUMBER:
 				Debug_USART_printf("num: ");

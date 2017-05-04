@@ -7,8 +7,9 @@
 #define TERM_MAX_LINES	10
 #define TERM_CHARS_P_L	51
 
-// INIT terminal display
+// Init / de-init
 void Disco_Term_Splash(void);
+void Disco_Term_Destroy(void);
 
 // Timer callback. redraws if dirty flag set
 void Disco_Term_Timer(void);
