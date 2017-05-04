@@ -135,21 +135,18 @@ void Disco_Term_Read_Char(unsigned char c)
 
 void Disco_Term_Read_Backspace(void)
 {
-	 // set last non-null char to null
-	size_t tlen = strlen(dterm.prompt);
-	// >3 for "> " (2 chars) plus \0
-	// -1 for 0reference, -2 to reach last real char
-	if( tlen > 2 ){
-		dterm.prompt[tlen-1] = '\0';
-		Disco_Term_MoveCursorLeft();
+	uint16_t cp_len = strlen(dterm.prompt) - dterm.cursor + 1;
+	
+	char* src = &dterm.prompt[dterm.cursor];
+	char* dest = src-1;
+
+	if(dterm.cursor > 2){
+		for(uint16_t i=0; i<cp_len; i++){
+			*dest++ = *src++;
+		}	
 	}
 
-	// can move cursor into string (not just edit from end)
-	/*if( dterm.cursor > 2){
-		dterm.p
-		dterm.cursor--;
-	}*/
-
+	Disco_Term_MoveCursorLeft();
 	Disco_Term_Draw_Prompt();
 }
 
