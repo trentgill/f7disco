@@ -222,68 +222,42 @@ unsigned char* Disco_Term_Eval(void)
 	char* firstchar = &(dterm.prompt[2]);
 	strcpy(lstring, firstchar);
 
-
-	lua_pushboolean(luaTerm, 1);
+	// just some tests for using the lua stack
+/*	lua_pushboolean(luaTerm, 1);
 	lua_pushnumber(luaTerm, 444);
 	lua_pushstring(luaTerm, "a word");
 	lua_pushnumber(luaTerm, 0x444);
 	stackDump(luaTerm);	
+*/
+	// save history ix
+	uint8_t tmp = dterm.ix_eval;
+	static stack_size = lua_gettop(luaTerm); // save size before
 
-	/*
-	int32_t error = luaL_loadstring(luaTerm, lstring) ||
-					lua_pcall(luaTerm, 0,0,0);
-	if (error){
-		Debug_USART_printf("err\n\r");
+	int32_t error = luaL_dostring(luaTerm, lstring);
+	if(error){
 		Disco_Term_Read_Debug(lua_tostring(luaTerm, -1));
-		lua_pop(luaTerm, 1);
+		lua_pop(luaTerm, 1); // cleanup
 	} else {
-		Debug_USART_putn(lua_gettop(luaTerm));
-		if(lua_isnumber(luaTerm, -1)){
-			Debug_USART_printf("num\n\r");
-		}
-		strcpy(lstring, lua_tostring(luaTerm, -1));
-		Debug_USART_printf("ok\n\r");
+		Disco_Term_Read_Debug(""); // clear debug window
+		HAL_Delay(20);
+
+		strcpy(lstring, lua_tostring(luaTerm, -1) );
 		if(strlen(lstring) > TERM_CHARS_P_L) {
 			strncpy(dterm.line[dterm.ix_eval], lstring, 47);
 		} else {
 			strcpy(dterm.line[dterm.ix_eval], lstring);
 		}
-	}*/
-	// luaopen_io(luaTerm);
-	
-	// **EVAL**
-	
-	/*while (fgets(buff, sizeof(buff), stdin) != NULL) {
-		error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
-				lua_pcall(L, 0, 0, 0);
-		if (error) {
-			fprintf(stderr, "%s", lua_tostring(L, -1));
-			lua_pop(L, 1);  // pop error message from the stack
-		}
-	}*/
+		// redraw history
+		Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
 
 
+		// move index into line[] buffer
+		dterm.ix_eval++;
+		if( dterm.ix_eval > (TERM_MAX_LINES-1) ) { dterm.ix_eval = 0; }
 
-/*
-	luaL_dostring(luaTerm, lstring);
-	strcpy(lstring, lua_tostring(luaTerm, -1) );
-
-	if(strlen(lstring) > TERM_CHARS_P_L) {
-		strncpy(dterm.line[dterm.ix_eval], lstring, 47);
-	} else {
-		strcpy(dterm.line[dterm.ix_eval], lstring);
-	}*/
-
-	// redraw history, clear prompt & redraw screen
-	Disco_Term_Redraw_History( (int8_t)dterm.ix_eval );
-	Disco_Term_Read_Clear();
-
-	// save ix
-	uint8_t tmp = dterm.ix_eval;
-
-	// move index into line[] buffer
-	dterm.ix_eval++;
-	if( dterm.ix_eval > (TERM_MAX_LINES-1) ) { dterm.ix_eval = 0; }
+		// clear prompt & redraw screen
+		Disco_Term_Read_Clear();
+	}
 
 	// return copy of output
 	return dterm.line[tmp];
@@ -304,7 +278,7 @@ static void stackDump(lua_State* L)
 				break;
 			case LUA_TBOOLEAN:
 				Debug_USART_printf("bool: ");
-				HAL_Delay(20);
+				HAL_Delay(30);
 				Debug_USART_printf(lua_toboolean(L, i) ? "true" : "false");
 				break;
 			case LUA_TNUMBER:
