@@ -127,7 +127,22 @@ void Disco_Term_Read_Char(unsigned char c)
 	buf[0] = c;
 
 	// ONLY JOINS ON END: update to insert at cursor
-	strcat( dterm.prompt, buf );
+	// strcat( dterm.prompt, buf );
+
+	uint16_t cur_len = strlen(dterm.prompt);
+	if(cur_len < TERM_CHARS_P_L){
+		// insert
+		uint16_t cp_len = cur_len - dterm.cursor + 1; // chars after cursor
+		
+		char* src = &dterm.prompt[cur_len]; // index of the null char
+		char* dest = src + 1;
+		for(uint16_t i=0; i<cp_len; i++){
+			*dest-- = *src--; // shift chars 1 place to the right
+		}
+		*dest = c; // insert input into the gap
+	} else {
+		// error! string overflows screen!
+	}
 
 	Disco_Term_MoveCursorRight();
 	Disco_Term_Draw_Prompt();
