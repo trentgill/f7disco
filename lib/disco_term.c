@@ -36,7 +36,7 @@ void Disco_Term_Splash(void)
 		strcpy( dterm.line[i], " \0\0" );
 	}
 
-	// set to 50%
+	// set to 20% (stops HF noise / lowers power)
 	BSP_LCD_SetBrightness(20);
 	HAL_DSI_Refresh(&hdsi_discovery);
 }
@@ -60,7 +60,7 @@ void Disco_Term_Draw_Prompt( void )
 	
 	// draw cursor to screen
 	uint16_t cursor = 2;
-	BSP_LCD_DisplayChar( cursor, LINE(19), dterm.prompt[cursor]);
+	BSP_LCD_DisplayChar( cursor * BSP_LCD_GetCharWidth(), LINE(19), dterm.prompt[cursor]);
 
 	// redraw screen
 	HAL_DSI_Refresh(&hdsi_discovery);
