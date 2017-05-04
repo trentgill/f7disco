@@ -13,6 +13,7 @@ typedef struct term {
 	unsigned char 	prompt[TERM_CHARS_P_L]; // << sloppy
 	uint8_t 		ix_eval;
 	uint8_t 		cursor;
+	uint8_t 		dirty;
 	// uint8_t			ix_len;
 } term_t;
 
@@ -22,6 +23,8 @@ void Disco_Term_Draw_Prompt(void);
 void Disco_Term_MoveCursorLeft( void );
 void Disco_Term_MoveCursorRight( void );
 
+// lua privates
+static void stackDump(lua_State* L);
 
 // private vars
 term_t 	dterm;
@@ -44,9 +47,18 @@ void Disco_Term_Splash(void)
 	dterm.cursor = 2; // first char after "> "
 	Disco_Term_Redraw_History((int8_t)dterm.ix_eval);
 	Disco_Term_Draw_Prompt();
-	HAL_Delay(50);
+
 	Disco_Term_Read_Debug("it's a lua terminal!");
 }
+
+void Disco_Term_Timer(void)
+{
+	if(dterm.dirty){
+		dterm.dirty = 0;
+		HAL_DSI_Refresh(&hdsi_discovery);
+	}
+}
+
 
 // REPL
 
@@ -71,7 +83,7 @@ void Disco_Term_Draw_Prompt( void )
 	BSP_LCD_DisplayChar( dterm.cursor * BSP_LCD_GetCharWidth(), LINE(19), cc );
 
 	// redraw screen
-	HAL_DSI_Refresh(&hdsi_discovery);
+	dterm.dirty = 1;
 }
 
 void Disco_Term_MoveCursorLeft( void )
@@ -173,7 +185,7 @@ void Disco_Term_Read_Debug(unsigned char* s)
 	// Use top line only
 	BSP_LCD_ClearStringLine(1);
 	BSP_LCD_DisplayStringAtLine(1, s);
-	HAL_DSI_Refresh(&hdsi_discovery);
+	dterm.dirty = 1;
 }
 
 void Disco_Term_Redraw_History(int8_t row)
@@ -194,21 +206,64 @@ void Disco_Term_Redraw_History(int8_t row)
 unsigned char* Disco_Term_Eval(void)
 {
 	// format prompt into string for lua w return
-	char lstring[60] = "return \0";
+	// char lstring[60] = "return \0";
+	char lstring[60];
 	char* firstchar = &(dterm.prompt[2]);
-	strcat(lstring, firstchar);
+	strcpy(lstring, firstchar);
 
 	lua_State *luaTerm = luaL_newstate();
 	luaL_openlibs(luaTerm);
+
+	lua_pushboolean(luaTerm, 1);
+	lua_pushnumber(luaTerm, 444);
+	lua_pushstring(luaTerm, "a word");
+	lua_pushnumber(luaTerm, 0x444);
+	stackDump(luaTerm);	
+
+	/*
+	int32_t error = luaL_loadstring(luaTerm, lstring) ||
+					lua_pcall(luaTerm, 0,0,0);
+	if (error){
+		Debug_USART_printf("err\n\r");
+		Disco_Term_Read_Debug(lua_tostring(luaTerm, -1));
+		lua_pop(luaTerm, 1);
+	} else {
+		Debug_USART_putn(lua_gettop(luaTerm));
+		if(lua_isnumber(luaTerm, -1)){
+			Debug_USART_printf("num\n\r");
+		}
+		strcpy(lstring, lua_tostring(luaTerm, -1));
+		Debug_USART_printf("ok\n\r");
+		if(strlen(lstring) > TERM_CHARS_P_L) {
+			strncpy(dterm.line[dterm.ix_eval], lstring, 47);
+		} else {
+			strcpy(dterm.line[dterm.ix_eval], lstring);
+		}
+	}*/
+	// luaopen_io(luaTerm);
 	
 	// **EVAL**
+	
+	/*while (fgets(buff, sizeof(buff), stdin) != NULL) {
+		error = luaL_loadbuffer(L, buff, strlen(buff), "line") ||
+				lua_pcall(L, 0, 0, 0);
+		if (error) {
+			fprintf(stderr, "%s", lua_tostring(L, -1));
+			lua_pop(L, 1);  // pop error message from the stack
+		}
+	}*/
+
+
+
+/*
 	luaL_dostring(luaTerm, lstring);
 	strcpy(lstring, lua_tostring(luaTerm, -1) );
+
 	if(strlen(lstring) > TERM_CHARS_P_L) {
 		strncpy(dterm.line[dterm.ix_eval], lstring, 47);
 	} else {
 		strcpy(dterm.line[dterm.ix_eval], lstring);
-	}
+	}*/
 
 	lua_close(luaTerm);
 
@@ -225,4 +280,40 @@ unsigned char* Disco_Term_Eval(void)
 
 	// return copy of output
 	return dterm.line[tmp];
+}
+
+static void stackDump(lua_State* L)
+{
+	int top = lua_gettop(L);
+	for(uint16_t i=1; i<=top; i++){
+		int t = lua_type(L, i);
+		switch(t) {
+			case LUA_TSTRING:
+				Debug_USART_printf("string: ");
+				HAL_Delay(20);
+				Debug_USART_printf(lua_tostring(L,i));
+				HAL_Delay(20);
+				Debug_USART_printf("\n\r");
+				break;
+			case LUA_TBOOLEAN:
+				Debug_USART_printf("bool: ");
+				HAL_Delay(20);
+				Debug_USART_printf(lua_toboolean(L, i) ? "true\n\r" : "false\n\r");
+				break;
+			case LUA_TNUMBER:
+				Debug_USART_printf("num: ");
+				HAL_Delay(20);
+				Debug_USART_putn(lua_tonumber(L, i));
+				break;
+			default:
+				Debug_USART_printf("other: ");
+				HAL_Delay(20);
+				Debug_USART_printf(lua_typename(L, t));
+				break;
+		}
+		HAL_Delay(30);
+		Debug_USART_printf(" ");
+	}
+	HAL_Delay(30);
+	Debug_USART_printf("\n\r");
 }

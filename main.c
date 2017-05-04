@@ -117,9 +117,10 @@ int main(void)
 	static uint8_t usb_set = 0;
 	while(1){
 		// Disco_Codec_Loop(); // process audio loop
-		if( (uwTick - lastEventTime) > 1000 ){
+		if( (uwTick - lastEventTime) > 50 ){
 			// once per second
 			lastEventTime = uwTick;
+			Disco_Term_Timer();
 		} else if( uwTick < lastEventTime ){
 			// OVERFLOW
 			lastEventTime = uwTick;
