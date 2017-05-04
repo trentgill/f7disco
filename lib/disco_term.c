@@ -15,8 +15,14 @@ typedef struct term {
 	// uint8_t			ix_len;
 } term_t;
 
+// private declarations
+void Disco_Term_Redraw_History(int8_t row);
+void Disco_Term_Draw_Prompt(void);
+
+// private vars
 term_t 	dterm;
 
+// function definitions
 void Disco_Term_Splash(void)
 {
 	BSP_LCD_SetTextColor(LCD_COLOR_GRAY);
@@ -25,20 +31,17 @@ void Disco_Term_Splash(void)
 	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
 	BSP_LCD_FillRect(0, 72, 800, 408);
 
-
 	BSP_LCD_SetFont(&Font24);
 	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);  // white on blue
 
-	// clear buffers
-	strcpy( dterm.prompt, "> \0\0" );
-	for(uint8_t i=0; i<TERM_MAX_LINES; i++){
-		strcpy( dterm.line[i], " \0\0" );
-	}
-
 	// set to 20% (stops HF noise / lowers power)
 	BSP_LCD_SetBrightness(20);
-	HAL_DSI_Refresh(&hdsi_discovery);
+	
+	// Initialize prompt & clear history
+	strcpy( dterm.prompt, "> \0\0" );
+	Disco_Term_Redraw_History((int8_t)dterm.ix_eval);
+	Disco_Term_Draw_Prompt();
 }
 
 // REPL
