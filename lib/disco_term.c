@@ -44,6 +44,8 @@ void Disco_Term_Splash(void)
 	dterm.cursor = 2; // first char after "> "
 	Disco_Term_Redraw_History((int8_t)dterm.ix_eval);
 	Disco_Term_Draw_Prompt();
+	HAL_Delay(50);
+	Disco_Term_Read_Debug("it's a lua terminal!");
 }
 
 // REPL
@@ -172,10 +174,6 @@ void Disco_Term_Read_Debug(unsigned char* s)
 	BSP_LCD_ClearStringLine(1);
 	BSP_LCD_DisplayStringAtLine(1, s);
 	HAL_DSI_Refresh(&hdsi_discovery);
-
-	// Reset colours for standard output
-	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 }
 
 void Disco_Term_Redraw_History(int8_t row)
