@@ -31,3 +31,61 @@ File structure is arranged as follows:
 - add a general purpose timer that sets flag in main loop
 - simple audio keywords for lua->dsp.params
 - usb-hid keyboard support direct to the shell
+
+
+
+
+// sys architecture
+
+
+init(){
+	serial_debugger()
+	USB_stack()
+	LEDs()
+	audio_codec()
+	lcd_screen()
+
+	print('rtg')
+}
+
+main( lowest priority infinite loop ){
+	lcd_redraw( if dirty flag set )
+}
+
+callbacks(){
+	serial_rx(unimplemented)(
+		low priority
+		needs a buffer in case of high throughput)
+	USB_device_detect(
+		sporadic
+		must be low priority)
+	USB_event(
+		freq: 1kHz
+		calls lua 'EVAL' -> calls C functions
+		might take a long time)
+	audio_block(
+		freq: 48kHz
+		high % of cpu use)
+	lua_callback(
+		internal timers?)
+	timer(
+		freq: set at runtime
+		low priority)
+}
+
+/* implementation details */
+
+// audio_block should remain in irq (prioity 0)
+	// needs to drop frames if out of time (not stack irqs)
+
+// serial_rx:
+	// push data to buffer & set flag for main loop
+
+// usb device change:
+	// unclear what needs to happen here
+
+// usb event:
+	// ??
+
+// timer:
+	// ??
