@@ -19,7 +19,6 @@ void codec_to_array(uint16_t* codec, float* ch0, float* ch1, uint16_t b_size);
 void array_to_codec(float* ch0, float* ch1, uint16_t* codec, uint16_t b_size);
 
 // public functions
-	// NB: snuck some init functions in here :)
 void DSP_Block_Init( uint32_t sample_rate, uint16_t b_size )
 {
 	s_rate = sample_rate;
@@ -36,9 +35,6 @@ void DSP_Block_Init( uint32_t sample_rate, uint16_t b_size )
 	// osc_sine_init( &vcoSine );
 }
 
-extern float master_pitch;
-extern float master_mod;
-__IO uint8_t DSP_Dirty = 0;
 void DSP_Block_Process(uint16_t* in_codec, uint16_t* out_codec, uint16_t b_size)
 {
 	float	 in[2][b_size];
