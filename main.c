@@ -97,6 +97,7 @@ int main(void)
 
 	// HW initialization
 	Debug_USART_Init();
+	USB_HID_Init();
 	Disco_HW_Init();
 	Disco_Codec_Init();
 
@@ -104,16 +105,10 @@ int main(void)
 	Debug_USART_printf("time to party!\n\r");
 	HAL_Delay(100);
 
-	// USB stack
-	USB_HID_Init();
-
 	// APPLICATION code
 
 	// Infinite loop
 	static uint32_t lastEventTime = 0;
-	static uint8_t lastButton;
-	static uint8_t p_count, m_count;
-	char state[4] = { '0', ' ', '0', '\0' };
 	static uint8_t usb_set = 0;
 	while(1){
 		// Disco_Codec_Loop(); // process audio loop
@@ -132,19 +127,6 @@ int main(void)
 			usb_set = 1;
 			HID_MenuGo();
 		}
-		// hacked synthesis settings change
-		/*uint8_t press = BSP_PB_GetState(0);
-		if( (lastButton != press) && (press == 1) ){
-			master_pitch   = m_pitches[p_count++];
-			master_mod     = m_modrates[m_count++];
-			DSP_Dirty      = 1;
-			if(p_count >= 4){ p_count = 0; }
-			if(m_count >= 5){ m_count = 0; }
-			state[0] = p_count+48;
-			state[2] = m_count+48;
-			Disco_Term_Read_Debug(state);
-	    }
-	    lastButton = press;*/
 	}
 	return 0;
 }
