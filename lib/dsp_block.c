@@ -44,15 +44,6 @@ void DSP_Block_Process(uint16_t* in_codec, uint16_t* out_codec, uint16_t b_size)
 	float    mix[b_size];
 	uint16_t i, j;
 
-	if( DSP_Dirty ){
-		// apply changes
-		for( j=0; j<VOICE_COUNT; j++ ){
-			vcoRamp[j].rate = BASE_PITCH * master_pitch * (j+1);
-			envRamp[j].rate = MOD_BASE * master_mod * (j+2);
-		}
-		DSP_Dirty = 0;
-	}
-
 	codec_to_array(in_codec, in[0], in[1], b_size);
 
 		// oscillators & gates
