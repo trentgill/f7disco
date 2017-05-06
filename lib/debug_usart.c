@@ -161,3 +161,44 @@ void Debug_USART_putn8(uint8_t n)
 		}
 	}
 }
+
+// New school func calls
+void DB_print_var(char* name, uint32_t n, uint8_t ret_flag)
+{
+	static char str[24];
+	uint8_t len = strlen(name);
+	if(len > 10) { len = 10; }
+	uint8_t i;
+	for(i=0; i<len; i++){
+		str[i] = name[i];
+	}
+	// add separator
+	strcpy(&str[i], ": 0x");
+	i += 4;
+	// print hex readout
+	uint32_t temp;
+	for(int8_t j=7; j>=0; j--){
+		temp = n >> (j<<2);
+		temp &= 0x0000000F; // mask lowest nibble
+		if(temp<10) { // numeric
+			str[(i+7)-j] = 48+(uint8_t)temp;
+		} else { // alpha
+			str[(i+7)-j] = 55+(uint8_t)temp;
+		}
+	}
+	if(ret_flag){
+		strcpy(&str[i+8], "\n\r\0"); // carriage return
+	} else {
+		strcpy(&str[i+8], ", \0"); // add space
+	}
+	Debug_USART_printf(str); // call basic print function
+}
+
+
+
+
+
+
+
+
+

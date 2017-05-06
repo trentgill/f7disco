@@ -51,4 +51,7 @@ void Debug_USART_printf(char *s);
 void Debug_USART_putn(uint32_t n);
 void Debug_USART_putn8(uint8_t n);
 
+// Next Gen Fn Calls
+void DB_print_var(char* name, uint32_t n, uint8_t ret_flag);
+
 #endif
