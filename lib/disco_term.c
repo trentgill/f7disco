@@ -231,7 +231,7 @@ unsigned char* Disco_Term_Eval(void)
 */
 	// save history ix
 	uint8_t tmp = dterm.ix_eval;
-	static stack_size = lua_gettop(luaTerm); // save size before
+	// static uint32_t stack_size = lua_gettop(luaTerm); // save size before
 
 	int32_t error = luaL_dostring(luaTerm, lstring);
 	if(error){
