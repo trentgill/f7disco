@@ -103,6 +103,9 @@ int main(void)
 
 	HAL_Delay(100);
 	Debug_USART_printf("time to party!\n\r");
+	Debug_USART_printf("time to party!\n\r");
+	Debug_USART_printf("time to party!\n\r");
+
 	HAL_Delay(100);
 
 	// APPLICATION code

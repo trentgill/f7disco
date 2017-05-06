@@ -2,11 +2,14 @@
 #include "debug_usart.h"
 #include "disco_hw.h"
 #include "disco_term.h"
+#include "str_buffer.h"
 
 // public declaration for use in transmit function
 USART_HandleTypeDef handusart;
 // __IO ITStatus uReady = RESET;
 unsigned char USART_Rx_Buf[51];
+
+str_buffer_t str_buf; // circular string buffer
 
 void Debug_USART_Init(void)
 {
@@ -18,6 +21,8 @@ void Debug_USART_Init(void)
 	handusart.Init.Parity 			= USART_PARITY_NONE;
 	handusart.Init.Mode 			= USART_MODE_TX_RX;
 	HAL_USART_Init( &handusart );
+
+	str_buffer_init(&str_buf, 256); // fifo for DMA buffer
 }
 
 // LOW LEVEL USART HARDWARE CONFIGURATION FUNCTION
@@ -90,13 +95,20 @@ void USARTx_DMA_TX_IRQHandler(void)
 }
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
 {
-	// Disco_Term_Read_Debug("TxCpltCallback");
-	// BSP_LED_Toggle(LED2);
-	HAL_USART_Receive_DMA( husart, USART_Rx_Buf, 5);
+	// NOT FIRING?!
+}
+
+void HAL_USART_TxHalfCpltCallback(USART_HandleTypeDef *husart)
+{
+	// NEEDS TO GO IN COMPLETE CALLBACK
+	if(str_buffer_notempty( &str_buf )){
+		char* so = str_buffer_dequeue( &str_buf );
+		HAL_USART_Transmit_DMA( &handusart, so, strlen(so) );
+	}
 }
 void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart)
 {
-	BSP_LED_On(LED1);
+	//
 }
 void USARTx_IRQHandler(void)
 {
@@ -107,21 +119,18 @@ void USARTx_IRQHandler(void)
 
 
 // Communication Functions
-
+void Debug_USART_printf(char *s)
+{
+	str_buffer_enqueue( &str_buf, s );
+	char* so = str_buffer_dequeue( &str_buf );
+	HAL_USART_Transmit_DMA( &handusart, so, strlen(so) );
+}
 void Debug_USART_putc(unsigned char c)
 {
 	static char str[4] = "0\n\r\0";
 	str[0] = c;
 	HAL_USART_Transmit_DMA( &handusart, str, 1 );
 }
-
-void Debug_USART_printf(char *s)
-{
-	HAL_USART_Transmit_DMA( &handusart, s, strlen(s) );
-
-	// Disco_Term_Read_Debug(USART_Rx_Buf);
-}
-
 void Debug_USART_putn(uint32_t n)
 {
 	// declared static as DMA just points directly to it
@@ -138,7 +147,6 @@ void Debug_USART_putn(uint32_t n)
 	}
 	Debug_USART_printf(str);
 }
-
 void Debug_USART_putn8(uint8_t n)
 {
 	uint8_t temp;

@@ -33,12 +33,15 @@
 #define RXBUFFERSIZE			TXBUFFERSIZE
 
 #define DBG_USART_TIMEOUT	0x40000 /* a long time */
+#define USART_FIFO_COUNT	0x8
+#define USART_MAX_LENGTH	0x20 // max print string is 32 chars
 
 // Setup functions & DMA/IT Handlers
 void Debug_USART_Init(void);
 void USARTx_DMA_RX_IRQHandler(void);
 void USARTx_DMA_TX_IRQHandler(void);
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart);
+void HAL_USART_TxHalfCpltCallback(USART_HandleTypeDef *husart);
 void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart);
 void USARTx_IRQHandler(void);
 
