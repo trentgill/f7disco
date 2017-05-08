@@ -61,7 +61,6 @@ void HID_MenuProcess(void)
 		// HID_SelectItem(DEMO_HID_menu, 0); 
 		hid_demo.state = HID_DEMO_WAIT;
 		hid_demo.select = 0;
-		Debug_USART_printf("wait\n\r");
 		break;        
 
 	case HID_DEMO_WAIT:
@@ -78,7 +77,7 @@ void HID_MenuProcess(void)
 				switch(hid_demo.select)
 				{
 				case 0:
-					Debug_USART_printf("demo_start\n\r");
+					// Debug_USART_printf("demo_start\n\r");
 					hid_demo.state = HID_DEMO_START;
 					break;
 
@@ -91,7 +90,7 @@ void HID_MenuProcess(void)
 					break;
 				}
 			}
-			Debug_USART_printf("no sel\n\r");
+			// Debug_USART_printf("no sel\n\r");
 		}
 		break; 
 
