@@ -92,14 +92,14 @@ void HID_MenuProcess(void)
 		else
 		{
 			// LCD_ErrLog("No supported HID device!\n");
-			Debug_USART_printf("no supported device\n\r");
+			Debug_USART_printf("no supported device\n\r\0");
 			hid_demo.state = HID_DEMO_WAIT;
 		}
 		break;
 
 	case HID_DEMO_REENUMERATE:
 		/* Force HID Device to re-enumerate */
-		Debug_USART_printf("force reenum\n\r");
+		Debug_USART_printf("force reenum\n\r\0");
 		USBH_ReEnumerate(&hUSBHost); 
 		hid_demo.state = HID_DEMO_WAIT;
 		break;
