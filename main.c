@@ -101,13 +101,8 @@ int main(void)
 	Disco_HW_Init();
 	Disco_Codec_Init();
 
-	// HAL_Delay(100);
-	// Debug_USART_printf("time to party!\n\r");
 	HAL_Delay(100);
 	Debug_USART_printf("time to party!\n\r");
-	// HAL_Delay(100);
-	Debug_USART_printf("msg2\n\r");
-
 	HAL_Delay(100);
 
 	// APPLICATION code
@@ -126,7 +121,6 @@ int main(void)
 		}
 
 		USB_HID_Loop(); // run main USB loop
-
 	}
 	return 0;
 }
