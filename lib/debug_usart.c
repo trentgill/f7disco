@@ -96,11 +96,6 @@ void USARTx_DMA_TX_IRQHandler(void)
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart)
 {
 	// NOT FIRING?!
-}
-
-void HAL_USART_TxHalfCpltCallback(USART_HandleTypeDef *husart)
-{
-	// NEEDS TO GO IN COMPLETE CALLBACK
 	if(str_buffer_notempty( &str_buf )){
 		char* so = str_buffer_dequeue( &str_buf );
 		HAL_USART_Transmit_DMA( &handusart, so, strlen(so) );
@@ -115,15 +110,14 @@ void USARTx_IRQHandler(void)
 	HAL_USART_IRQHandler( &handusart );
 }
 
-
-
-
 // Communication Functions
 void Debug_USART_printf(char *s)
 {
 	str_buffer_enqueue( &str_buf, s );
-	char* so = str_buffer_dequeue( &str_buf );
-	HAL_USART_Transmit_DMA( &handusart, so, strlen(so) );
+	if(handusart.State == HAL_USART_STATE_READY){
+		char* so = str_buffer_dequeue( &str_buf );
+		HAL_USART_Transmit_DMA( &handusart, so, strlen(so) );
+	}		
 }
 void Debug_USART_putc(unsigned char c)
 {

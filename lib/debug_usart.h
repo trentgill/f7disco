@@ -41,7 +41,6 @@ void Debug_USART_Init(void);
 void USARTx_DMA_RX_IRQHandler(void);
 void USARTx_DMA_TX_IRQHandler(void);
 void HAL_USART_TxCpltCallback(USART_HandleTypeDef *husart);
-void HAL_USART_TxHalfCpltCallback(USART_HandleTypeDef *husart);
 void HAL_USART_RxCpltCallback(USART_HandleTypeDef *husart);
 void USARTx_IRQHandler(void);
 

@@ -49,5 +49,5 @@ char* str_buffer_dequeue(str_buffer_t* buf)
 }
 uint8_t str_buffer_notempty(str_buffer_t* buf)
 {
-	return (buf->ix_read == buf->ix_write);
+	return (buf->ix_read != buf->ix_write);
 }
