@@ -46,13 +46,6 @@ void HID_MenuGo(void)
 	HID_MenuProcess();
 }
 
-void HID_MenuInit(void)
-{
-	// called once at init
-	hid_demo.state = HID_DEMO_IDLE;
-	HID_MenuProcess();
-}
-
 void HID_MenuProcess(void)
 {
 	switch(hid_demo.state)

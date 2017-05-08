@@ -53,7 +53,7 @@
 // #include "stm32f769i_discovery.h"
 
 HCD_HandleTypeDef hhcd;
-
+extern HID_DEMO_StateMachine hid_demo;
 extern USBH_HandleTypeDef hUSBHost;
 extern HID_ApplicationTypeDef Appli_state;// = APPLICATION_IDLE;
 // HID_DEMO_StateMachine hid_demo;
@@ -65,7 +65,11 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 
 void USB_HID_Init(void)
 {
-	HID_MenuInit();
+	// HID_MenuInit();
+    // called once at init
+  hid_demo.state = HID_DEMO_IDLE;
+  HID_MenuProcess();
+
 	USBH_Init(&hUSBHost, USBH_UserProcess, HOST_USER_CLASS_ACTIVE); // Init Host Lib
 	USBH_RegisterClass(&hUSBHost, USBH_HID_CLASS);
 	USBH_Start(&hUSBHost);  

@@ -111,10 +111,10 @@ int main(void)
 	HAL_Delay(100);
 
 	// APPLICATION code
+	HID_MenuGo();
 
 	// Infinite loop
 	static uint32_t lastEventTime = 0;
-	static uint8_t usb_set = 0;
 	while(1){
 		// Disco_Codec_Loop(); // process audio loop
 		if( (uwTick - lastEventTime) > 50 ){
@@ -128,10 +128,6 @@ int main(void)
 
 		USB_HID_Loop(); // run main USB loop
 
-		if(usb_set == 0){
-			usb_set = 1;
-			HID_MenuGo();
-		}
 	}
 	return 0;
 }

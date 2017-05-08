@@ -49,7 +49,7 @@ typedef enum {
 // Exported functions
 
 // static void HID_MenuInit(void);
-void HID_MenuInit(void);
+// void HID_MenuInit(void);
 void HID_MenuProcess(void);
 void HID_MenuGo(void);
 
