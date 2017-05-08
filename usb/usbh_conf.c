@@ -80,17 +80,22 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)
   switch(id)
   { 
   case HOST_USER_SELECT_CONFIGURATION:
+    Debug_USART_printf("select\n\r");
     break;
     
   case HOST_USER_DISCONNECTION:
+    Debug_USART_printf("disc\n\r");
     Appli_state = APPLICATION_DISCONNECT;
     break;
     
   case HOST_USER_CLASS_ACTIVE:
+    Debug_USART_printf("active\n\r");
+    hid_demo.select = 0x80;
     Appli_state = APPLICATION_READY;
     break;
     
   case HOST_USER_CONNECTION:
+    Debug_USART_printf("connect\n\r");
     Appli_state = APPLICATION_START;
     break;
     

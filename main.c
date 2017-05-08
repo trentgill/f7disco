@@ -111,7 +111,6 @@ int main(void)
 	HAL_Delay(100);
 
 	// APPLICATION code
-	HID_MenuGo();
 
 	// Infinite loop
 	static uint32_t lastEventTime = 0;

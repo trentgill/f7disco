@@ -37,15 +37,6 @@ uint8_t *DEMO_HID_menu[] = {
 	(uint8_t *)"      2 - Re-Enumerate                                                      ",
 };
 
-
-void HID_MenuGo(void)
-{
-	// CHEAT
-	hid_demo.select = 0x80;
-	Appli_state = APPLICATION_READY;
-	HID_MenuProcess();
-}
-
 void HID_MenuProcess(void)
 {
 	switch(hid_demo.state)
@@ -97,12 +88,6 @@ void HID_MenuProcess(void)
 				hid_demo.keyboard_state = HID_KEYBOARD_IDLE; 
 				hid_demo.state = HID_DEMO_KEYBOARD;
 			}
-			else if(USBH_HID_GetDeviceType(&hUSBHost) == HID_MOUSE)
-			{
-				Debug_USART_printf("mouse \n\r");
-				// hid_demo.mouse_state = HID_MOUSE_IDLE;  
-				// hid_demo.state = HID_DEMO_MOUSE;
-			}
 		}
 		else
 		{
@@ -118,15 +103,6 @@ void HID_MenuProcess(void)
 		USBH_ReEnumerate(&hUSBHost); 
 		hid_demo.state = HID_DEMO_WAIT;
 		break;
-
-	case HID_DEMO_MOUSE:
-		if(Appli_state == APPLICATION_READY)
-		{
-			Debug_USART_printf("mouse process\n\r");
-			// HID_MouseMenuProcess();
-			// USBH_MouseDemo(&hUSBHost);
-		}
-		break; 
 
 	case HID_DEMO_KEYBOARD:
 		if(Appli_state == APPLICATION_READY)  

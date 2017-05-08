@@ -51,7 +51,6 @@ typedef enum {
 // static void HID_MenuInit(void);
 // void HID_MenuInit(void);
 void HID_MenuProcess(void);
-void HID_MenuGo(void);
 
 // from stm32f7xx_it.h
 #ifdef USE_USB_FS
