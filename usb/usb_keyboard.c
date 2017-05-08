@@ -66,7 +66,7 @@ void HID_MenuProcess(void)
 					break;
 
 				case 1:
-					Debug_USART_printf("reenum\n\r");
+					Debug_USART_printf("reenum\n\r\0");
 					hid_demo.state = HID_DEMO_REENUMERATE;
 					break;
 
@@ -84,7 +84,7 @@ void HID_MenuProcess(void)
 			// Debug_USART_putn( USBH_HID_GetDeviceType(&hUSBHost) );
 			if(USBH_HID_GetDeviceType(&hUSBHost) == HID_KEYBOARD)
 			{
-				Debug_USART_printf("keys\n\r");
+				Debug_USART_printf("keys\n\r\0");
 				hid_demo.keyboard_state = HID_KEYBOARD_IDLE; 
 				hid_demo.state = HID_DEMO_KEYBOARD;
 			}

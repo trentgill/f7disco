@@ -101,8 +101,7 @@ int main(void)
 	Disco_HW_Init();
 	Disco_Codec_Init();
 
-	HAL_Delay(100);
-	Debug_USART_printf("time to party!\n\r");
+	Debug_USART_printf("time to party!\n\r\0");
 	HAL_Delay(100);
 
 	// APPLICATION code

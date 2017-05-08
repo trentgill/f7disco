@@ -22,7 +22,7 @@ void Debug_USART_Init(void)
 	handusart.Init.Mode 			= USART_MODE_TX_RX;
 	HAL_USART_Init( &handusart );
 
-	str_buffer_init(&str_buf, 256); // fifo for DMA buffer
+	str_buffer_init(&str_buf, 512); // fifo for DMA buffer
 }
 
 // LOW LEVEL USART HARDWARE CONFIGURATION FUNCTION
