@@ -1,5 +1,4 @@
-#ifndef _debug_usart_
-#define _debug_usart_
+#pragma once
 
 #include <stm32f7xx.h>
 
@@ -52,5 +51,3 @@ void Debug_USART_putn8(uint8_t n);
 
 // Next Gen Fn Calls
 void DB_print_var(char* name, uint32_t n, uint8_t ret_flag);
-
-#endif

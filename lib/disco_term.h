@@ -1,5 +1,4 @@
-#ifndef _disco_term_
-#define _disco_term_
+#pragma once
 
 #include <string.h>
 #include <stdio.h>
@@ -25,5 +24,3 @@ void Disco_Term_Set_Cursor( uint8_t keycode );
 
 
 unsigned char* Disco_Term_Eval(void);
-
-#endif

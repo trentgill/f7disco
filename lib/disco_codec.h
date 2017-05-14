@@ -1,5 +1,4 @@
-#ifndef _disco_codec_
-#define _disco_codec_
+#pragma once
 
 #include <stm32f769i_discovery.h>
 #include <stm32f769i_discovery_audio.h>
@@ -36,5 +35,3 @@ void Disco_Codec_Init(void);
 void Disco_Codec_Loop(void); // temporary: call from main loop
 
 // void DMA2_Stream6_IRQHandler(void);
-
-#endif

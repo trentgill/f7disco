@@ -1,9 +1,6 @@
-#ifndef _disco_hw_
-#define _disco_hw_
+#pragma once
 
 #include <stm32f769i_discovery.h>
 
 // Public declarations
 void Disco_HW_Init(void);
-
-#endif

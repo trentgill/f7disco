@@ -1,5 +1,4 @@
-#ifndef _str_buffer_
-#define _str_buffer_
+#pragma once
 
 #include <stm32f7xx.h>
 
@@ -15,6 +14,3 @@ void str_buffer_init(str_buffer_t* buf, uint16_t len);
 void str_buffer_enqueue(str_buffer_t* buf, char* s);
 char* str_buffer_dequeue(str_buffer_t* buf);
 uint8_t str_buffer_notempty(str_buffer_t* buf);
-
-
-#endif
