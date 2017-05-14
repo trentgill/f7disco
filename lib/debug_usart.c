@@ -121,14 +121,14 @@ void Debug_USART_printf(char *s)
 }
 void Debug_USART_putc(unsigned char c)
 {
-	static char str[4] = "0\n\r\0";
+	char str[4] = "0\n\r\0";
 	str[0] = c;
 	HAL_USART_Transmit_DMA( &handusart, str, 1 );
 }
 void Debug_USART_putn(uint32_t n)
 {
 	// declared static as DMA just points directly to it
-	static char str[13] = "0xFFFFFFFF\n\r\0";
+	char str[13] = "0xFFFFFFFF\n\r\0";
 	uint32_t temp;
 	for(int8_t i=7; i>=0; i--){
 		temp = n >> (i<<2);
@@ -159,7 +159,7 @@ void Debug_USART_putn8(uint8_t n)
 // New school func calls
 void DB_print_var(char* name, uint32_t n, uint8_t ret_flag)
 {
-	static char str[24];
+	char str[24];
 	uint8_t len = strlen(name);
 	if(len > 10) { len = 10; }
 	uint8_t i;
