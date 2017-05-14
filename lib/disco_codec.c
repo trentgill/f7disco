@@ -102,7 +102,7 @@ void Disco_Codec_Init(void)
 void Disco_Codec_Loop(void)
 {
 	if( UpdatePointer != -1 ){ // dma waiting flag set
-		int position = UpdatePointer; // 0 or PLAY_HALF_BUFF
+		uintptr_t position = UpdatePointer; // 0 or PLAY_HALF_BUFF
 		UpdatePointer = -1; // reset flag
 
 		// BSP_LED_On(LED1);

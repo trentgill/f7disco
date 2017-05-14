@@ -265,9 +265,9 @@ unsigned char* Disco_Term_Eval(void)
 
 static void stackDump(lua_State* L)
 {
-	int top = lua_gettop(L);
+	int32_t top = lua_gettop(L);
 	for(uint16_t i=1; i<=top; i++){
-		int t = lua_type(L, i);
+		int32_t t = lua_type(L, i);
 		switch(t) {
 			case LUA_TSTRING:
 				Debug_USART_printf("string: ");

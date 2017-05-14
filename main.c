@@ -79,15 +79,8 @@ void oncePerSecond(void);
   * @param  None
   * @retval None 
   */
-__IO float master_pitch;
-__IO float master_mod;
-extern uint8_t DSP_Dirty;
 
-// const float m_pitches[4] = {1, 5/3, 10/9, 3/2};
-const float m_pitches[4] = {1, 1.66667, 1.11111, 1.5};
-const float m_modrates[5] = {1,0.72,0.3,1.3,1.7};
-
-int main(void)
+uint32_t main(void)
 {
 	// Configure low-level
 	MPU_Config();
