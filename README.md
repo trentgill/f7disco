@@ -22,16 +22,15 @@ File structure is arranged as follows:
 
 # Roadmap
 
-- usart to accept strings from minicom
-	- once doing string entry, need to move screen refresh to timer
-		> otherwise it will be called from uart interrupt!
 - wrLib integration: osc / gate arrangement
-- lua vm running on board
-- lua interpreter running
-- add a general purpose timer that sets flag in main loop
+- usb stack needs to work with more keyboards
+	+ currently limited to very small subset
+- cleanup usb stack & implement dynamic discovery / connection
+- lua callbacks to C functions via command line
+- design interaction between script writing & use (not just shell)
 - simple audio keywords for lua->dsp.params
-- usb-hid keyboard support direct to the shell
-
+- variable dsp-graph implementation
+- terminal based UI?!
 
 
 
